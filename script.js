@@ -58,16 +58,28 @@ rl.question(`📦 Enter the desired Package Name / Bundle ID (e.g., com.ripenapp
     }
 
     // iOS Project File (Fixing PRODUCT_BUNDLE_IDENTIFIER)
-    const pbxprojPath = path.join(process.cwd(), 'ios', `${projectName}.xcodeproj`, 'project.pbxproj');
-    if (fs.existsSync(pbxprojPath)) {
+    // Dynamically find the .xcodeproj folder since its name may vary
+    const iosDir = path.join(process.cwd(), 'ios');
+    let pbxprojPath = null;
+
+    if (fs.existsSync(iosDir)) {
+        const xcodeProjects = fs.readdirSync(iosDir).filter(f => f.endsWith('.xcodeproj'));
+        if (xcodeProjects.length > 0) {
+            pbxprojPath = path.join(iosDir, xcodeProjects[0], 'project.pbxproj');
+        }
+    }
+
+    if (pbxprojPath && fs.existsSync(pbxprojPath)) {
         let content = fs.readFileSync(pbxprojPath, 'utf8');
-        
+
         // Regex to replace any PRODUCT_BUNDLE_IDENTIFIER assignment
         // This catches "org.reactjs.native.example..." or anything else
         content = content.replace(/PRODUCT_BUNDLE_IDENTIFIER\s*=\s*["'][^"']+["'];/g, `PRODUCT_BUNDLE_IDENTIFIER = "${bundleId}";`);
-        
+
         fs.writeFileSync(pbxprojPath, content, 'utf8');
         console.log('  ✅ Patched iOS PRODUCT_BUNDLE_IDENTIFIER');
+    } else {
+        console.warn('  ⚠️  Could not find iOS project.pbxproj file');
     }
 
     console.log('\n✅ Setup Complete! Your Bundle ID is updated.\n');
