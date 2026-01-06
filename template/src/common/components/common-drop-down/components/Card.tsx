@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { Pressable, StyleProp, ViewStyle, TextStyle } from 'react-native';
 import { CommonText } from '@components';
 import { Pixelate } from '@utils';
@@ -10,51 +10,63 @@ type Props = {
   lastIndex: number;
   item: string;
   selectedValue: string;
-  highLightSelectedValue: boolean;
+  highLightSelectedValue?: boolean;
   onChangeSelect: (val: string) => void;
-  moreLabelContainerStyle: StyleProp<ViewStyle>;
-  moreLabelStyle: StyleProp<TextStyle>;
+  moreLabelContainerStyle?: StyleProp<ViewStyle>;
+  moreLabelStyle?: StyleProp<TextStyle>;
 };
 
-export const Card: React.FC<Props> = ({
-  currentIndex = 0,
-  lastIndex = 0,
-  item = '',
-  selectedValue = '',
+const CardComponent: React.FC<Props> = ({
+  currentIndex,
+  lastIndex,
+  item,
+  selectedValue,
   highLightSelectedValue = true,
-  onChangeSelect = _val => {},
-  moreLabelContainerStyle = {},
-  moreLabelStyle = {},
+  onChangeSelect,
+  moreLabelContainerStyle,
+  moreLabelStyle,
 }) => {
   const { theme } = useTheme();
   const styles = useDropDownStyles();
 
+  const isSelected = highLightSelectedValue && item === selectedValue;
+  const isLastItem = currentIndex === lastIndex;
+
+  // Memoize container style
+  const containerStyle = useMemo(
+    () =>
+      isLastItem
+        ? [styles.cardContainer, styles.borderRadius, moreLabelContainerStyle]
+        : [styles.cardContainer, moreLabelContainerStyle],
+    [isLastItem, styles.cardContainer, styles.borderRadius, moreLabelContainerStyle]
+  );
+
+  // Memoize text style
+  const textStyle = useMemo(
+    () => ({
+      marginLeft: Pixelate.widthNormalizer(20),
+      ...((moreLabelStyle as object) || {}),
+    }),
+    [moreLabelStyle]
+  );
+
+  // Memoize press handler
+  const handlePress = useCallback(() => {
+    onChangeSelect(item);
+  }, [onChangeSelect, item]);
+
   return (
-    <Pressable
-      style={
-        currentIndex === lastIndex
-          ? [styles.cardContainer, styles.borderRadius, moreLabelContainerStyle]
-          : [styles.cardContainer, moreLabelContainerStyle]
-      }
-      onPress={() => onChangeSelect(item)}>
+    <Pressable style={containerStyle} onPress={handlePress}>
       <CommonText
         content={item}
-        color={
-          highLightSelectedValue && item === selectedValue
-            ? theme.colors.secondary
-            : theme.colors.denary
-        }
-        size={highLightSelectedValue && item === selectedValue ? 16 : 15}
-        fontType={
-          highLightSelectedValue && item === selectedValue
-            ? 'VelaSans_Bold'
-            : 'VelaSans_Medium'
-        }
-        moreStyle={{
-          marginLeft: Pixelate.widthNormalizer(20),
-          moreLabelStyle,
-        }}
+        color={isSelected ? theme.colors.secondary : theme.colors.denary}
+        fontSize={isSelected ? 16 : 15}
+        fontType={isSelected ? 'InterExtraBold' : 'InterMedium'}
+        moreStyle={textStyle}
       />
     </Pressable>
   );
 };
+
+// Export memoized component to prevent unnecessary re-renders in lists
+export const Card = React.memo(CardComponent);

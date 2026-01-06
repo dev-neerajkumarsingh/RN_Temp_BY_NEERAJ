@@ -1,10 +1,8 @@
 import * as React from 'react';
 import { Text, StyleProp, TextStyle } from 'react-native';
 import type { FontTypes } from '@fonts';
-//import {} from 'react-i18next';
 import * as Fonts from '@fonts';
 import { Pixelate } from '@utils';
-//import { useTheme } from '@themes';
 
 type Props = {
   content: string;
@@ -16,42 +14,49 @@ type Props = {
   moreStyle?: StyleProp<TextStyle>[] | StyleProp<TextStyle>;
   otherProps?: any;
   children?: React.ReactNode;
+  numberOfLines?: number;
+  ellipsizeMode?: 'head' | 'middle' | 'tail' | 'clip';
 };
 
-export const CommonText: React.FC<Props> = ({
+const CommonTextComponent: React.FC<Props> = ({
   content,
-  color = 'black', // Default to the key 'black'
+  color = 'black',
   textAlign = 'left',
-  fontSize = 14, // Default size
-  lineHeight = fontSize + 5, // Default line height
-  fontType = Fonts.Inter_18ptBold, // Default to VelaSans_Medium
+  fontSize = 14,
+  lineHeight = fontSize + 5,
+  fontType = Fonts.Inter_18ptBold,
   moreStyle = {},
   otherProps,
   children = null,
+  numberOfLines,
+  ellipsizeMode,
 }) => {
-  //const { theme } = useTheme();
-  // const { selectedLang } = useSelector((state: RootState) => state.lang);
-  // const updatedContent =
-  //   selectedLang === 'en'
-  //     ? content
-  //     : LangList?.hasOwnProperty(content)
-  //     ? LangList[content as keyof typeof LangList][
-  //         selectedLang === 'en' ? 0 : 1
-  //       ]
-  //     : content;
-
-  // const textColor = getColor(String(color ?? 'black'), theme);
+  // Memoize text styles to prevent recalculation on every render
+  const textStyle = React.useMemo(
+    () => [
+      {
+        color,
+        textAlign,
+        fontSize: Pixelate.fontPixel(fontSize),
+        lineHeight: Pixelate.fontPixel(lineHeight),
+      },
+      { fontFamily: Fonts[fontType as keyof typeof Fonts] || fontType },
+      moreStyle,
+    ],
+    [color, textAlign, fontSize, lineHeight, fontType, moreStyle]
+  );
 
   return (
     <Text
-      style={[
-        { color, textAlign, fontSize: Pixelate.fontPixel(fontSize), lineHeight: Pixelate.fontPixel(lineHeight),  },
-        { fontFamily: Fonts[fontType as keyof typeof Fonts] || fontType },
-        moreStyle,
-      ]}
+      style={textStyle}
+      numberOfLines={numberOfLines}
+      ellipsizeMode={ellipsizeMode}
       {...otherProps}>
       {content}
       {children}
     </Text>
   );
 };
+
+// Export memoized component to prevent unnecessary re-renders
+export const CommonText = React.memo(CommonTextComponent);

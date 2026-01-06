@@ -1,17 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { View, Pressable, Keyboard } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTheme, GlobalStyles } from '@themes';
 import { RootState, hideToast } from '@redux';
-// import * as Progress from 'react-native-progress';
 import { CommonText, CommonImage } from '@components';
 import { useToasterStyles } from './Styles';
+import type { IconTypes } from '@icons';
+
+type ToastType = 'error' | 'success' | 'info' | 'warn';
+
+// Configuration map for toast types - improves reusability and maintainability
+const TOAST_CONFIG: Record<ToastType, { icon: IconTypes; colorKey: 'error' | 'success' | 'info' | 'warning'; bgKey: 'lightError' | 'lightSuccess' | 'lightInfo' | 'lightWarning' }> = {
+  error: { icon: 'error', colorKey: 'error', bgKey: 'lightError' },
+  success: { icon: 'tick', colorKey: 'success', bgKey: 'lightSuccess' },
+  info: { icon: 'info', colorKey: 'info', bgKey: 'lightInfo' },
+  warn: { icon: 'warning', colorKey: 'warning', bgKey: 'lightWarning' },
+};
 
 export const CommonToaster = () => {
-  const [states, setStates] = useState({
-    showToaster: false,
-    progressValue: 0,
-  });
+  const [showToaster, setShowToaster] = useState(false);
   const { status, type, title, message, duration } = useSelector(
     (store: RootState) => store.toast,
   );
@@ -20,103 +27,90 @@ export const CommonToaster = () => {
   const toasterStyles = useToasterStyles();
   const globalStyles = GlobalStyles(theme);
 
+  // Get toast configuration based on type
+  const toastConfig = useMemo(() => {
+    return type ? TOAST_CONFIG[type as ToastType] : null;
+  }, [type]);
+
+  // Memoize colors based on toast type
+  const toastColors = useMemo(() => {
+    if (!toastConfig) {
+      return {
+        borderColor: theme.colors.black,
+        backgroundColor: theme.colors.white,
+        textColor: theme.colors.black,
+      };
+    }
+    return {
+      borderColor: theme.colors[toastConfig.colorKey],
+      backgroundColor: theme.colors[toastConfig.bgKey],
+      textColor: theme.colors[toastConfig.colorKey],
+    };
+  }, [toastConfig, theme.colors]);
+
+  // Memoize container style
+  const containerStyle = useMemo(
+    () => [
+      toasterStyles.toastContainer,
+      {
+        borderColor: toastColors.borderColor,
+        backgroundColor: toastColors.backgroundColor,
+      },
+      globalStyles.commonShadow,
+    ],
+    [toasterStyles.toastContainer, toastColors, globalStyles.commonShadow]
+  );
+
+  // Memoize message style
+  const messageStyle = useMemo(
+    () => [
+      toasterStyles.toastTitle,
+      toasterStyles.toastMessage,
+      title && toasterStyles.toastMessageTop,
+    ],
+    [toasterStyles.toastTitle, toasterStyles.toastMessage, toasterStyles.toastMessageTop, title]
+  );
+
+  // Memoize close handler
+  const handleClose = useCallback(() => {
+    dispatch(hideToast());
+  }, [dispatch]);
+
   useEffect(() => {
-    setStates(prev => ({
-      ...prev,
-      showToaster: Boolean(status),
-      progressValue: 1,
-    }));
+    setShowToaster(Boolean(status));
 
     if (status) {
       Keyboard.dismiss();
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         dispatch(hideToast());
       }, duration);
+
+      return () => clearTimeout(timer);
     }
   }, [status, dispatch, duration]);
 
-  if (!states.showToaster) {
+  if (!showToaster) {
     return null;
   }
 
   return (
     <View style={toasterStyles.mainContainer}>
-      <View
-        style={[
-          toasterStyles.toastContainer,
-          {
-            borderColor:
-              type === 'error'
-                ? theme.colors.error
-                : type === 'success'
-                ? theme.colors.success
-                : type === 'info'
-                ? theme.colors.info
-                : type === 'warn'
-                ? theme.colors.warning
-                : theme.colors.black,
-            backgroundColor:
-              type === 'error'
-                ? theme.colors.lightError
-                : type === 'success'
-                ? theme.colors.lightSuccess
-                : type === 'info'
-                ? theme.colors.lightInfo
-                : type === 'warn'
-                ? theme.colors.lightWarning
-                : theme.colors.white,
-          },
-          globalStyles.commonShadow,
-        ]}>
+      <View style={containerStyle}>
         <View style={toasterStyles.toastContainerPosition}>
-          {type === 'error' ? (
+          {toastConfig && (
             <CommonImage
               sourceType="localSvg"
-              svgSource="error" // add error icon and pass the name here...
+              svgSource={toastConfig.icon}
               width={22}
               height={22}
-              color={theme.colors.error}
+              color={toastColors.textColor}
             />
-          ) : type === 'success' ? (
-            <CommonImage
-              sourceType="localSvg"
-              svgSource="tick" // add error icon and pass the name here...
-              width={2}
-              height={22}
-              color={theme.colors.success}
-            />
-          ) : type === 'info' ? (
-            <CommonImage
-              sourceType="localSvg"
-              svgSource="info" // add error icon and pass the name here...
-              width={22}
-              height={22}
-              color={theme.colors.info}
-            />
-          ) : type === 'warn' ? (
-            <CommonImage
-              sourceType="localSvg"
-              svgSource="warning" // add error icon and pass the name here...
-              width={22}
-              height={22}
-              color={theme.colors.warning}
-            />
-          ) : null}
+          )}
           <View style={toasterStyles.toastContentContainer}>
             {title && (
               <CommonText
                 content={title}
-                color={
-                  type === 'error'
-                    ? theme.colors.error
-                    : type === 'success'
-                    ? theme.colors.success
-                    : type === 'info'
-                    ? theme.colors.info
-                    : type === 'warn'
-                    ? theme.colors.warning
-                    : theme.colors.black
-                }
+                color={toastColors.textColor}
                 fontSize={18}
                 fontType={'InterExtraBold'}
                 moreStyle={toasterStyles.toastTitle}
@@ -125,64 +119,25 @@ export const CommonToaster = () => {
             {message && (
               <CommonText
                 content={message}
-                color={
-                  type === 'error' && !title
-                    ? theme.colors.error
-                    : type === 'success' && !title
-                    ? theme.colors.success
-                    : type === 'info' && !title
-                    ? theme.colors.info
-                    : type === 'warn' && !title
-                    ? theme.colors.warning
-                    : theme.colors.black
-                }
+                color={title ? theme.colors.black : toastColors.textColor}
                 fontSize={13}
                 fontType={'InterLight'}
-                moreStyle={[
-                  toasterStyles.toastTitle,
-                  toasterStyles.toastMessage,
-                  title && toasterStyles.toastMessageTop,
-                ]}
+                moreStyle={messageStyle}
               />
             )}
           </View>
         </View>
         <Pressable
           style={toasterStyles.toastCloseButton}
-          onPress={() => dispatch(hideToast())}>
+          onPress={handleClose}>
           <CommonImage
             sourceType="localSvg"
-            svgSource="close" // add close icon and pass the name here...
+            svgSource="close"
             width={16}
             height={16}
             color={theme.colors.black}
           />
         </Pressable>
-        {/* <Progress.Bar
-            animated={states.showToaster}
-            animationType="timing"
-            progress={states.progressValue}
-            width={Pixelate.screenWidth / 1.11}
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              height: 5,
-            }}
-            color={
-              type === 'success'
-                ? DefaultTheme.colors.neon2
-                : type === 'info'
-                ? DefaultTheme.colors.info
-                : type === 'error'
-                ? DefaultTheme.colors.red
-                : type === 'warn'
-                ? DefaultTheme.colors.yellow
-                : ''
-            }
-            unfilledColor={DefaultTheme.colors.transparent}
-            borderColor={DefaultTheme.colors.black}
-            borderRadius={0}
-          /> */}
       </View>
     </View>
   );

@@ -1,33 +1,28 @@
 import * as React from 'react';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import { useTheme, GlobalStyles } from '@themes';
-import { useLoaderStyles } from './Styles';
+import { ColorValue } from 'react-native';
+import { BaseLoader } from './Loader';
 
 type Props = {
-  loaderStatus: Boolean;
+  loaderStatus: boolean;
+  color?: ColorValue;
+  size?: 'small' | 'large';
 };
 
+/**
+ * Shimmer - Standalone loader component
+ * Uses secondary variant by default, controlled via props
+ */
 export const Shimmer: React.FC<Props> = ({
   loaderStatus,
+  color,
+  size = 'large',
 }): React.ReactElement | null => {
-  const { theme } = useTheme();
-  const themedStyles = GlobalStyles(theme);
-  const loaderStyles = useLoaderStyles();
-
-  if (!loaderStatus) {
-    return null;
-  }
-
   return (
-    <View
-      style={[
-        StyleSheet.absoluteFillObject,
-        themedStyles.commonModalBox,
-        themedStyles.centerContent,
-      ]}>
-      <View style={[loaderStyles.loaderBox, themedStyles.centerContent]}>
-        <ActivityIndicator size={'large'} color={theme.colors.secondary} />
-      </View>
-    </View>
+    <BaseLoader
+      visible={loaderStatus}
+      variant="secondary"
+      color={color}
+      size={size}
+    />
   );
 };

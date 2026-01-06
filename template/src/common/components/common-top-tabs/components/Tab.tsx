@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { Pressable } from 'react-native';
 import { CommonText } from '@components';
 import { useCommonTabStyles } from '../Styles';
@@ -12,35 +12,51 @@ type Props = {
   tabsLength: number;
 };
 
-export const Tab: React.FC<Props> = ({
-  item = '',
+const TabComponent: React.FC<Props> = ({
+  item,
   activeTab = false,
   tabType = 1,
   onPress,
-  tabsLength = 0,
+  tabsLength,
 }) => {
   const styles = useCommonTabStyles();
-  const actualWidth = Pixelate.screenWidth / 1.05;
+
+  // Memoize tab width calculation
+  const tabWidth = useMemo(() => {
+    const actualWidth = Pixelate.screenWidth / 1.05;
+    return actualWidth / tabsLength;
+  }, [tabsLength]);
+
+  // Memoize tab style based on active state and type
+  const tabStyle = useMemo(() => {
+    const baseStyle = { width: tabWidth };
+    let stateStyle;
+
+    if (activeTab) {
+      stateStyle = tabType === 1 ? styles.activeTab : styles.activeTab2;
+    } else {
+      stateStyle = tabType === 1 ? styles.inactiveTab : styles.inactiveTab2;
+    }
+
+    return [baseStyle, stateStyle];
+  }, [tabWidth, activeTab, tabType, styles]);
+
+  // Memoize press handler
+  const handlePress = useCallback(() => {
+    onPress(item);
+  }, [onPress, item]);
 
   return (
-    <Pressable
-      style={[
-        { width: actualWidth / tabsLength },
-        activeTab
-          ? tabType === 1
-            ? styles.activeTab
-            : styles.activeTab2
-          : tabType === 1
-          ? styles.inactiveTab
-          : styles.inactiveTab2,
-      ]}
-      onPress={() => onPress(item)}>
+    <Pressable style={tabStyle} onPress={handlePress}>
       <CommonText
         content={item}
-        size={activeTab ? 15 : 14}
-        fontType={activeTab ? 'VelaSans_Bold' : 'VelaSans_Light'}
+        fontSize={activeTab ? 15 : 14}
+        fontType={activeTab ? 'InterExtraBold' : 'InterLight'}
         moreStyle={activeTab ? styles.activeText : styles.inactiveText}
       />
     </Pressable>
   );
 };
+
+// Export memoized component to prevent unnecessary re-renders in tab lists
+export const Tab = React.memo(TabComponent);

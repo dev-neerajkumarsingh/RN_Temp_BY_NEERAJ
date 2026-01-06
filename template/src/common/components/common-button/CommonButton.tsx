@@ -63,7 +63,7 @@ type Props = {
   loader?: boolean;
 };
 
-export const CommonButton: React.FC<Props> = ({
+const CommonButtonComponent: React.FC<Props> = ({
   width = '100%',
   height = responsiveHeight(6),
   moreButtonStyle,
@@ -89,38 +89,48 @@ export const CommonButton: React.FC<Props> = ({
   const Colors = theme.colors;
   const themedStyles = GlobalStyles(theme);
 
-  return (
-    <Pressable
-      style={[
-        styles.container(width, height, theme.colors.secondary), // Pass button width, height and background color
-        themedStyles.centerContent,
-        moreButtonStyle,
-        disabled && { opacity: 0.5 }, // Apply opacity to disabled button
-      ]}
-      onPress={onPress}
-      disabled={disabled}
-      onLongPress={onLongPress}>
-      {!loader && contentType === 'text' ? (
-        <CommonText
-          content={label || ''}
-          color={textColor}
-          fontSize={fontSize}
-          textAlign={textAlign}
-          fontType={fontType as FontTypes | undefined}
-          lineHeight={lineHeight}
-          moreStyle={moreTextStyle}
-        />
-      ) : !loader && contentType === 'localNonSvg' ? (
-        <CommonImage
-          source={imgSource}
-          sourceType={contentType}
-          width={imgWidth || '100%'}
-          height={imgHeight || '100%'}
-          resizeMode={'contain'}
-        />
-      ) : (
-        !loader &&
-        contentType === 'localSvg' && (
+  // Memoize container style to prevent recalculation on every render
+  const containerStyle = React.useMemo(
+    () => [
+      styles.container(width, height, theme.colors.secondary),
+      themedStyles.centerContent,
+      moreButtonStyle,
+      disabled && { opacity: 0.5 },
+    ],
+    [width, height, theme.colors.secondary, themedStyles.centerContent, moreButtonStyle, disabled]
+  );
+
+  // Memoize button content to prevent unnecessary re-renders
+  const renderContent = React.useMemo(() => {
+    if (loader) {
+      return <ActivityIndicator size={'small'} color={Colors.primary} />;
+    }
+
+    switch (contentType) {
+      case 'text':
+        return (
+          <CommonText
+            content={label || ''}
+            color={textColor}
+            fontSize={fontSize}
+            textAlign={textAlign}
+            fontType={fontType as FontTypes | undefined}
+            lineHeight={lineHeight}
+            moreStyle={moreTextStyle}
+          />
+        );
+      case 'localNonSvg':
+        return (
+          <CommonImage
+            source={imgSource}
+            sourceType={contentType}
+            width={imgWidth || '100%'}
+            height={imgHeight || '100%'}
+            resizeMode={'contain'}
+          />
+        );
+      case 'localSvg':
+        return (
           <CommonImage
             svgSource={svgType}
             sourceType={contentType}
@@ -129,9 +139,38 @@ export const CommonButton: React.FC<Props> = ({
             color={svgColor}
             resizeMode={'contain'}
           />
-        )
-      )}
-      {loader && <ActivityIndicator size={'small'} color={Colors.primary} />}
+        );
+      default:
+        return null;
+    }
+  }, [
+    loader,
+    contentType,
+    label,
+    textColor,
+    fontSize,
+    textAlign,
+    fontType,
+    lineHeight,
+    moreTextStyle,
+    imgSource,
+    imgWidth,
+    imgHeight,
+    svgType,
+    svgColor,
+    Colors.primary,
+  ]);
+
+  return (
+    <Pressable
+      style={containerStyle}
+      onPress={onPress}
+      disabled={disabled}
+      onLongPress={onLongPress}>
+      {renderContent}
     </Pressable>
   );
 };
+
+// Export memoized component to prevent unnecessary re-renders when parent updates
+export const CommonButton = React.memo(CommonButtonComponent);

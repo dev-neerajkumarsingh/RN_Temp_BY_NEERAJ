@@ -8,17 +8,11 @@ import {
   TextStyle,
 } from 'react-native';
 import { useTheme } from '@themes';
-// import { LangList } from '@constants';
 import { CommonText, CommonImage } from '@components';
 import { useInpuptStyles } from './Styles';
 import { responsiveFontSize, responsiveWidth } from '@utils';
 import type { IconTypes } from '@icons';
 import type { FontTypes } from '@fonts';
-
-// type LangListType = {
-//   [key: string]: string[];
-// };
-// const langList: LangListType = LangList;
 
 type Props = {
   placeholder?: string;
@@ -52,7 +46,7 @@ type Props = {
   onPressRightIcon?: (text: string) => void;
   msgError?: string;
   onFocus?: () => void;
-  // Customization props
+  onBlur?: () => void;
   containerStyle?: StyleProp<ViewStyle>;
   inputStyle?: StyleProp<TextStyle>;
   errorTextStyle?: StyleProp<TextStyle>;
@@ -70,7 +64,7 @@ type Props = {
   renderRightIcon?: () => React.ReactNode;
 };
 
-export const CommonInput: React.FC<Props> = ({
+const CommonInputComponent: React.FC<Props> = ({
   moreContainerStyle,
   placeholder,
   placeholderTextColor,
@@ -89,7 +83,6 @@ export const CommonInput: React.FC<Props> = ({
   textInputRef,
   returnKeyType,
   autoCapitalize,
-  textAlignVertical,
   fontFamily = 'InterMedium',
   leftIcon,
   leftIconWidth = 3.5,
@@ -101,6 +94,7 @@ export const CommonInput: React.FC<Props> = ({
   onPressRightIcon,
   msgError = '',
   onFocus,
+  onBlur,
   containerStyle,
   inputStyle,
   errorTextStyle,
@@ -108,48 +102,99 @@ export const CommonInput: React.FC<Props> = ({
   renderLeftIcon,
   renderRightIcon,
 }) => {
-  // const { selectedLang } = useSelector((state: RootState) => state.lang);
-  // const updatedPlaceholder =
-  //   selectedLang === 'en'
-  //     ? placeholder
-  //     : LangList?.hasOwnProperty(placeholder)
-  //     ? langList[placeholder][selectedLang === 'en' ? 0 : 1]
-  //     : placeholder;
   const { theme } = useTheme();
   const inputStyles = useInpuptStyles();
 
+  // Memoize border color calculation
+  const borderColor = React.useMemo(() => {
+    if (!disableError && msgError?.length > 0) {
+      return theme.colors.error;
+    }
+    if (value?.length > 0) {
+      return theme.colors.senary;
+    }
+    return theme.colors.borderColor1;
+  }, [disableError, msgError, value, theme.colors]);
+
+  // Memoize container style
+  const computedContainerStyle = React.useMemo(
+    () => [
+      inputStyles.container,
+      {
+        borderColor,
+        backgroundColor: theme.colors.primary,
+      },
+      moreContainerStyle,
+      containerStyle,
+    ],
+    [inputStyles.container, borderColor, theme.colors.primary, moreContainerStyle, containerStyle]
+  );
+
+  // Memoize text input style
+  const computedInputStyle = React.useMemo(
+    () => [
+      inputStyles.textInputContainer,
+      {
+        color: inputColor || theme.colors.secondary,
+        fontFamily,
+        fontSize: responsiveFontSize(2),
+      },
+      inputStyle,
+    ],
+    [inputStyles.textInputContainer, inputColor, theme.colors.secondary, fontFamily, inputStyle]
+  );
+
+  // Memoize right icon press handler
+  const handleRightIconPress = React.useCallback(() => {
+    if (onPressRightIcon && rightIcon) {
+      onPressRightIcon(rightIcon.toString());
+    }
+  }, [onPressRightIcon, rightIcon]);
+
+  // Memoize left icon rendering
+  const leftIconElement = React.useMemo(() => {
+    if (renderLeftIcon) {
+      return renderLeftIcon();
+    }
+    if (leftIcon) {
+      return (
+        <CommonImage
+          sourceType="localSvg"
+          svgSource={leftIcon}
+          moreStyles={inputStyles.leftIconContainer}
+          width={responsiveWidth(leftIconWidth)}
+          height={responsiveWidth(leftIconHeight)}
+          color={theme.colors.secondary}
+        />
+      );
+    }
+    return <View style={inputStyles.textInputContainerLeft} />;
+  }, [renderLeftIcon, leftIcon, inputStyles, leftIconWidth, leftIconHeight, theme.colors.secondary]);
+
+  // Memoize right icon rendering
+  const rightIconElement = React.useMemo(() => {
+    if (renderRightIcon) {
+      return renderRightIcon();
+    }
+    if (rightIcon) {
+      return (
+        <CommonImage
+          sourceType="localSvg"
+          svgSource={rightIcon}
+          width={responsiveWidth(rightIconWidth)}
+          height={responsiveWidth(rightIconHeight)}
+          color={theme.colors.secondary}
+        />
+      );
+    }
+    return null;
+  }, [renderRightIcon, rightIcon, rightIconWidth, rightIconHeight, theme.colors.secondary]);
+
   return (
     <>
-      <View
-        style={[
-          inputStyles.container,
-          {
-            borderColor:
-              !disableError && msgError?.length > 0
-                ? theme.colors.error
-                : value?.length > 0
-                ? theme.colors.senary
-                : theme?.colors.borderColor1,
-            backgroundColor: theme.colors.primary,
-          },
-          moreContainerStyle,
-          containerStyle,
-        ]}>
+      <View style={computedContainerStyle}>
         <View style={[inputStyles.leftContainer, moreInputStyle]}>
-          {renderLeftIcon ? (
-            renderLeftIcon()
-          ) : leftIcon ? (
-            <CommonImage
-              sourceType="localSvg"
-              svgSource={leftIcon}
-              moreStyles={inputStyles.leftIconContainer}
-              width={responsiveWidth(leftIconWidth)}
-              height={responsiveWidth(leftIconHeight)}
-              color={theme.colors.secondary}
-            />
-          ) : (
-            <View style={inputStyles.textInputContainerLeft} />
-          )}
+          {leftIconElement}
           <TextInput
             ref={textInputRef}
             placeholder={placeholder}
@@ -166,39 +211,17 @@ export const CommonInput: React.FC<Props> = ({
             autoCapitalize={autoCapitalize}
             autoCorrect={false}
             value={value}
-            // textAlignVertical={textAlignVertical}
             onChangeText={onChangeText}
-            style={[
-              inputStyles.textInputContainer,
-              {
-                color: inputColor || theme.colors.secondary,
-                fontFamily,
-                fontSize: responsiveFontSize(2),
-              },
-              inputStyle,
-            ]}
+            style={computedInputStyle}
             onFocus={onFocus}
+            onBlur={onBlur}
           />
         </View>
         {(renderRightIcon || rightIcon) && (
           <Pressable
             style={[inputStyles.rightContainer, moreRightContainerStyle]}
-            onPress={() => {
-              onPressRightIcon &&
-                rightIcon &&
-                onPressRightIcon(rightIcon.toString());
-            }}>
-            {renderRightIcon
-              ? renderRightIcon()
-              : rightIcon && (
-                  <CommonImage
-                    sourceType="localSvg"
-                    svgSource={rightIcon}
-                    width={responsiveWidth(rightIconWidth)}
-                    height={responsiveWidth(rightIconHeight)}
-                    color={theme.colors.secondary}
-                  />
-                )}
+            onPress={handleRightIconPress}>
+            {rightIconElement}
           </Pressable>
         )}
         {Boolean(!editable) && <View style={inputStyles.disabledContainer} />}
@@ -215,3 +238,6 @@ export const CommonInput: React.FC<Props> = ({
     </>
   );
 };
+
+// Export memoized component to prevent unnecessary re-renders
+export const CommonInput = React.memo(CommonInputComponent);
