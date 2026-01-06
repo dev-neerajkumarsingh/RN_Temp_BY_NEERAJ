@@ -1,0 +1,164 @@
+{
+  "Continue": [
+    "Continue", "ଜାରି ରଖ |"
+  ],
+  "Submit": [
+    "Submit", "ସବମିଟ୍"
+  ],
+  "Login": [
+    "Login", "ଲଗଇନ୍ କରନ୍ତୁ |"
+  ],
+  "Email": [
+    "Email", "ଇମେଲ୍ କରନ୍ତୁ |"
+  ],
+  "Password": [
+    "Password", "ପାସୱାର୍ଡ"
+  ],
+  "START": [
+    "Start", "ଆରମ୍ଭ କରନ୍ତୁ"
+  ],
+  "Start": [
+    "Start", "ଆରମ୍ଭ କରନ୍ତୁ"
+  ],
+  "VIEW CERTIFICATE": [
+    "VIEW CERTIFICATE", "ସର୍ଟିଫିକେଟ ଦେଖନ୍ତୁ"
+  ],
+  "Review": [
+    "Review", "ଆଉ ଥରେ ଦେଖନ୍ତୁ"
+  ],
+  "Feedback": [
+    "Feedback", "ଫିଡବ୍ୟାକ୍"
+  ],
+  "Name": [
+    "Name", "ନାମ"
+  ],
+  "Phone Number": [
+    "Phone Number", "ଫୋନ୍ ନମ୍ବର |"
+  ],
+  "Profile": [
+    "Profile", "ପ୍ରୋଫାଇଲ୍"
+  ],
+  "Edit": [
+    "Edit", "ଏଡିଟ (ପରିବର୍ତନ କରନ୍ତୁ)"
+  ],
+  "Logout": [
+    "Logout", "ଲଗଆଉଟ୍ |"
+  ],
+  "No data to review!": [
+    "No data to review!", "ସମୀକ୍ଷା କରିବାକୁ କ data ଣସି ତଥ୍ୟ ନାହିଁ!"
+  ],
+  "There is no question assigned!": [
+    "There is no question assigned!", "କ question ଣସି ପ୍ରଶ୍ନ ନ୍ୟସ୍ତ ହୋଇନାହିଁ!"
+  ],
+  "Something went wrong! Please try again.": [
+    "Something went wrong! Please try again.", "କିଛି ଭୁଲ ହୋଇଗଲା! ଦୟାକରି ପୁନର୍ବାର ଚେଷ୍ଟା କରନ୍ତୁ |"
+  ],
+  "There is no question to review!" : [
+    "There is no question to review!", "ସମୀକ୍ଷା କରିବାର କ is ଣସି ପ୍ରଶ୍ନ ନାହିଁ!"
+  ],
+  "Your answer has been submitted successfully!": [
+    "Your answer has been submitted successfully!", "ତୁମର ଉତ୍ତର ସଫଳତାର ସହିତ ଉପସ୍ଥାପିତ ହୋଇଛି!"
+  ],
+  "Search": [
+    "Search", "ସନ୍ଧାନ କର |"
+  ],
+  "Filter": [
+    "Filter", "ଫିଲ୍ଟର୍"
+  ],
+  "Pending": [
+    "Pending", "ପେଣ୍ଡିଂ"
+  ],
+  "Approved": [
+    "Approved", "ଆପୃଭ୍ଡ୍"
+  ],
+  "It seems your internet connection is off. Please check your connection and try again!": [
+    "It seems your internet connection is off. Please check your connection and try again!", "ଲାଗୁଛି ତୁମର ଇଣ୍ଟରନେଟ୍ ସଂଯୋଗ ବନ୍ଦ ଅଛି | ଦୟାକରି ଆପଣଙ୍କର ସଂଯୋଗ ଯାଞ୍ଚ କରନ୍ତୁ ଏବଂ ପୁନର୍ବାର ଚେଷ୍ଟା କରନ୍ତୁ!"
+  ],
+  "Try again": [
+    "Try again", "ପୁନର୍ବାର ଚେଷ୍ଟା କରନ୍ତୁ |"
+  ],
+  "Oops!": [
+    "Oops!", "ଓହୋ!"
+  ],
+  "You've been logged out, please login again.": [
+    "You've been logged out, please login again.", "ଆପଣ ଲଗ୍ ଆଉଟ୍ ହୋଇଛନ୍ତି, ଦୟାକରି ପୁନର୍ବାର ଲଗ୍ଇନ୍ କରନ୍ତୁ |"
+  ],
+  "MAS List": [
+    "MAS List", "MAS ଲିଷ୍ଟ"
+  ],
+  "ANM List": [
+    "ANM List", "ANM ଲିଷ୍ଟ"
+  ],
+  "PHM List": [
+    "PHM List", "PHM ଲିଷ୍ଟ"
+  ],
+  "Back": [
+    "Back", "ବ୍ୟାକ୍ ( ପଛକୁ ଯାନ୍ତୁ)"
+  ],
+  "Next": [
+    "Next", "ନେକ୍ସଟ୍ (ଆଗକୁ ଯାନ୍ତୁ)"
+  ],
+  "Enter your score": [
+    "Enter your score", "ଆପଣଙ୍କ ସ୍କୋର ଦିଅନ୍ତୁ"
+  ],
+  "Upload Image": [
+    "Upload Image", "ପ୍ରତିଛବି ଅପଲୋଡ୍ କରନ୍ତୁ |"
+  ],
+  "Change Language (English)": [
+    "Change Language (English)", "ଭାଷା ପରିବର୍ତ୍ତନ (ଇଂରାଜୀ)"
+  ],
+  "Change Language (Odia)": [
+    "Change Language (Odia)", "ଭାଷା ପରିବର୍ତ୍ତନ କରନ୍ତୁ (ଓଡିଆ)"
+  ],
+  "Total Score:": [
+    "Total Score:", "ମୋଟ ସ୍କୋର:"
+  ],
+  "MAS Score": [
+    "MAS Score", "MAS ସ୍କୋର |"
+  ],
+  "ANM Score": [
+    "ANM Score", "ANM ସ୍କୋର |"
+  ],
+  "PHM Score": [
+    "PHM Score", "PHM ସ୍କୋର |"
+  ],
+  "Uploaded Image": [
+    "Uploaded Image", "ପ୍ରତିଛବି ଅପଲୋଡ୍ ହୋଇଛି |"
+  ],
+  "Your score": [
+    "Your score", "ତୁମର ସ୍କୋର |"
+  ],
+  "View MAS List": [
+    "View MAS List", "MAS ତାଲିକା ଦେଖନ୍ତୁ |"
+  ],
+  "View ANM List": [
+    "View ANM List", "ANM ତାଲିକା ଦେଖନ୍ତୁ |"
+  ],
+  "Please upload atleast 1 proof!": [
+    "Please upload atleast 1 proof!", "ଦୟାକରି atleast 1 ପ୍ରମାଣ ଅପଲୋଡ୍ କରନ୍ତୁ!"
+  ],
+  "Please enter score first!": [
+    "Please enter score first!", "ଦୟାକରି ପ୍ରଥମେ ସ୍କୋର ପ୍ରବେଶ କରନ୍ତୁ!"
+  ],
+  "Maximum score is": [
+    "Maximum score is", "ସର୍ବାଧିକ ସ୍କୋର ହେଉଛି |"
+  ],
+  "Minimum score is": [
+    "Minimum score is", "ସର୍ବାଧିକ ସ୍କୋର ହେଉଛି |"
+  ],
+  "Name can not be same as previous!": [
+    "Name can not be same as previous!", "ନାମ ପୂର୍ବ ପରି ସମାନ ହୋଇପାରିବ ନାହିଁ!"
+  ],
+  "Name can not be empty!": [
+    "Name can not be empty!", "ନାମ ଖାଲି ହୋଇପାରିବ ନାହିଁ!"
+  ],
+  "Please resubmit your answer!": [
+    "Please resubmit your answer!", "ଦୟାକରି ଆପଣଙ୍କର ଉତ୍ତର ପୁନ ub ପଠାନ୍ତୁ!"
+  ],
+  "File Size Limit Exceeded\nPlease select a file up to 10 MB.": [
+    "File Size Limit Exceeded\nPlease select a file up to 10 MB.", "ଫାଇଲ୍ ଆକାର ସୀମା ଅତିକ୍ରମ କରିଛି\nଦୟାକରି 10 MB ପର୍ଯ୍ୟନ୍ତ ଏକ ଫାଇଲ୍ ଚୟନ କରନ୍ତୁ |"
+  ],
+  "Error picking document:": [
+    "Error picking document:", "ଡକ୍ୟୁମେଣ୍ଟ ବାଛିବାରେ ତ୍ରୁଟି:"
+  ]  
+}

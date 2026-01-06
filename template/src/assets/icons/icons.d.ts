@@ -1,0 +1,15 @@
+export type IconTypes =
+  | 'arrowleft'
+  | 'camera'
+  | 'close'
+  | 'download'
+  | 'error_network'
+  | 'error'
+  | 'eye_hide'
+  | 'eye_show'
+  | 'filledArrow'
+  | 'gallery'
+  | 'info'
+  | 'tick'
+  | 'warning'
+  | 'placeholder';

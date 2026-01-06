@@ -1,0 +1,22 @@
+{
+  "name": "rn_template",
+  "version": "0.0.2",
+  "description": "A feature-rich React Native template for all kind of projects.",
+  "private": false,
+  "main": "template.config.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/neeraj-ripenapps/rn_template_by_neeraj.git"
+  },
+  "keywords": [
+    "react-native",
+    "template",
+    "react-native-template"
+  ],
+  "license": "MIT",
+  "files": [
+    "template/",
+    "template.config.js",
+    "script.js"
+  ]
+}
