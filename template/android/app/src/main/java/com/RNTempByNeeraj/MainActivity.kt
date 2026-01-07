@@ -1,4 +1,4 @@
-package com.rntempbyneeraj
+package com.RNTempByNeeraj
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

@@ -157,7 +157,7 @@ function applyBundleId(targetBundleId, existingSourceDir) {
     const newJavaPath = path.join(javaBaseDir, ...bundleParts);
 
     // Find existing source directory (could be old default or any other path)
-    const oldJavaPath = existingSourceDir || path.join(javaBaseDir, 'com', 'rntempbyneeraj');
+    const oldJavaPath = existingSourceDir || path.join(javaBaseDir, 'com', 'RNTempByNeeraj');
 
     if (fs.existsSync(oldJavaPath) && oldJavaPath !== newJavaPath) {
         // Create new directory structure
