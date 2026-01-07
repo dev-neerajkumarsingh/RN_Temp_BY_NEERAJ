@@ -11,7 +11,7 @@ const rl = readline.createInterface({
 });
 
 console.log('\n---------------------------------------------------------');
-console.log('🚀 RipenApps Template: Finalizing Native Configuration');
+console.log('🚀 Neeraj Template: Finalizing Native Configuration');
 console.log('---------------------------------------------------------\n');
 
 // 1. Get the Project Name (e.g., "DummyApp")
@@ -49,7 +49,7 @@ function rmDirSync(dirPath) {
   }
 }
 
-rl.question(`📦 Enter the desired Package Name / Bundle ID (e.g., com.ripenapps.myapp): `, (bundleId) => {
+rl.question(`📦 Enter the desired Package Name / Bundle ID (e.g., com.companyname.myapp): `, (bundleId) => {
   if (!bundleId || bundleId.trim() === '') {
     console.log('\n⚠️  No Bundle ID provided. Keeping defaults.');
     rl.close();
@@ -131,8 +131,11 @@ rl.question(`📦 Enter the desired Package Name / Bundle ID (e.g., com.ripenapp
     if (pbxprojPath && fs.existsSync(pbxprojPath)) {
         let content = fs.readFileSync(pbxprojPath, 'utf8');
 
-        // Regex to replace any PRODUCT_BUNDLE_IDENTIFIER assignment
-        content = content.replace(/PRODUCT_BUNDLE_IDENTIFIER\s*=\s*["']?[^"';]+["']?;/g, `PRODUCT_BUNDLE_IDENTIFIER = "${bundleId}";`);
+        // Regex to replace PRODUCT_BUNDLE_IDENTIFIER with quoted value
+        content = content.replace(/PRODUCT_BUNDLE_IDENTIFIER\s*=\s*"[^"]+";/g, `PRODUCT_BUNDLE_IDENTIFIER = "${bundleId}";`);
+
+        // Also handle unquoted values (fallback)
+        content = content.replace(/PRODUCT_BUNDLE_IDENTIFIER\s*=\s*[^";]+;/g, `PRODUCT_BUNDLE_IDENTIFIER = "${bundleId}";`);
 
         fs.writeFileSync(pbxprojPath, content, 'utf8');
         console.log('  ✅ Patched iOS PRODUCT_BUNDLE_IDENTIFIER');

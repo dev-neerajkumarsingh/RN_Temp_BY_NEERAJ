@@ -6,7 +6,7 @@
   "main": "template.config.js",
   "repository": {
     "type": "git",
-    "url": "https://gitlab.com/neeraj-ripenapps/rn_template_by_neeraj.git"
+    "url": "https://github.com/dev-neerajkumarsingh/RN_Temp_BY_NEERAJ.git"
   },
   "keywords": [
     "react-native",
