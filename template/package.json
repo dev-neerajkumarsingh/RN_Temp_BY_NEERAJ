@@ -1,5 +1,5 @@
 {
-  "name": "RNTemplate",
+  "name": "RNTempByNeeraj",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -10,7 +10,7 @@
     "ios-clean": "cd ios && rm -rf Pods build Podfile.lock && pod install && cd .. && react-native run-ios",
     "lint": "eslint .",
     "start": "watchman watch-del-all && react-native start --reset-cache",
-    "deep-clean": "rm -rf node_modules package-lock.json && watchman watch-del-all && rm -rf ios/build && rm -rf android/build android/app/build android/app/.cxx && npm i",
+    "deep-clean": "rm -rf node_modules package-lock.json && watchman watch-del-all && rm -rf ios/build ios/Pods ios/Podfile.lock && rm -rf android/build android/app/build android/app/.cxx && npm i",
     "test": "jest",
     "prepare": "husky",
     "rename": "npx react-native-rename"
