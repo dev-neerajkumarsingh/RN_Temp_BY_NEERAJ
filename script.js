@@ -160,21 +160,25 @@ function applyBundleId(targetBundleId, existingSourceDir) {
     const oldJavaPath = existingSourceDir || path.join(javaBaseDir, 'com', 'RNTempByNeeraj');
 
     if (fs.existsSync(oldJavaPath) && oldJavaPath !== newJavaPath) {
+        // Check if newJavaPath is inside oldJavaPath (would cause deletion of new files)
+        const normalizedOld = path.normalize(oldJavaPath) + path.sep;
+        const normalizedNew = path.normalize(newJavaPath);
+        const isNewInsideOld = normalizedNew.startsWith(normalizedOld);
+
         // Create new directory structure
         fs.mkdirSync(newJavaPath, { recursive: true });
 
         // Copy files to new location
-        const kotlinFiles = fs.readdirSync(oldJavaPath);
-        kotlinFiles.forEach(file => {
+        const ktFiles = ['MainActivity.kt', 'MainApplication.kt'];
+        ktFiles.forEach(file => {
             const srcFile = path.join(oldJavaPath, file);
             const destFile = path.join(newJavaPath, file);
-            if (fs.statSync(srcFile).isFile()) {
+            if (fs.existsSync(srcFile) && fs.statSync(srcFile).isFile()) {
                 fs.copyFileSync(srcFile, destFile);
             }
         });
 
         // Update package declarations in Kotlin files
-        const ktFiles = ['MainActivity.kt', 'MainApplication.kt'];
         ktFiles.forEach(file => {
             const filePath = path.join(newJavaPath, file);
             if (fs.existsSync(filePath)) {
@@ -184,18 +188,29 @@ function applyBundleId(targetBundleId, existingSourceDir) {
             }
         });
 
-        // Remove old directory structure
-        rmDirSync(oldJavaPath);
+        // Only remove old files/directory if new path is NOT inside old path
+        if (isNewInsideOld) {
+            // New path is inside old path - only delete the source files, not the directory
+            ktFiles.forEach(file => {
+                const srcFile = path.join(oldJavaPath, file);
+                if (fs.existsSync(srcFile)) {
+                    fs.unlinkSync(srcFile);
+                }
+            });
+        } else {
+            // Safe to remove old directory structure
+            rmDirSync(oldJavaPath);
 
-        // Clean up empty parent directories
-        let parentDir = path.dirname(oldJavaPath);
-        while (parentDir !== javaBaseDir && fs.existsSync(parentDir)) {
-            const contents = fs.readdirSync(parentDir);
-            if (contents.length === 0) {
-                fs.rmdirSync(parentDir);
-                parentDir = path.dirname(parentDir);
-            } else {
-                break;
+            // Clean up empty parent directories
+            let parentDir = path.dirname(oldJavaPath);
+            while (parentDir !== javaBaseDir && fs.existsSync(parentDir)) {
+                const contents = fs.readdirSync(parentDir);
+                if (contents.length === 0) {
+                    fs.rmdirSync(parentDir);
+                    parentDir = path.dirname(parentDir);
+                } else {
+                    break;
+                }
             }
         }
 
