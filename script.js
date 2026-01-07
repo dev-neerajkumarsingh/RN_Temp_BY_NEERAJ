@@ -157,7 +157,7 @@ function applyBundleId(targetBundleId, existingSourceDir) {
     const newJavaPath = path.join(javaBaseDir, ...bundleParts);
 
     // Find existing source directory (could be old default or any other path)
-    const oldJavaPath = existingSourceDir || path.join(javaBaseDir, 'com', 'RNTempByNeeraj');
+    const oldJavaPath = existingSourceDir || path.join(javaBaseDir, 'com', 'rntempbyneeraj');
 
     if (fs.existsSync(oldJavaPath) && oldJavaPath !== newJavaPath) {
         // Check if newJavaPath is inside oldJavaPath (would cause deletion of new files)

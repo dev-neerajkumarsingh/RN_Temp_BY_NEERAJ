@@ -78,9 +78,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.RNTempByNeeraj"
+    namespace "com.rntempbyneeraj"
     defaultConfig {
-        applicationId "com.RNTempByNeeraj"
+        applicationId "com.rntempbyneeraj"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
