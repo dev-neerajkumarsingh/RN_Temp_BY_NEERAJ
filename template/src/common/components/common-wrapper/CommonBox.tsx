@@ -15,7 +15,7 @@ type Props = {
   loaderStatus?: boolean;
   moreStyles?: StyleProp<ViewStyle>[] | StyleProp<ViewStyle>;
   isModal?: boolean;
-  statusBarStyle?: 'light-content' | 'dark-content';
+  statusBarStyle?: 'light-content' | 'dark-content' | 'auto';
   useKeyboardAvoidingView?: boolean;
   useScrollView?: boolean;
   keyboardVerticalOffset?: number;
@@ -24,10 +24,10 @@ type Props = {
 };
 
 export const CommonBox: React.FC<Props> = ({
-  children,
+  children = <></>,
   loaderStatus = false,
-  moreStyles,
-  isModal,
+  moreStyles = {},
+  isModal = false,
   statusBarStyle = 'dark-content',
   useKeyboardAvoidingView = false,
   useScrollView = false,
@@ -35,10 +35,17 @@ export const CommonBox: React.FC<Props> = ({
   showsVerticalScrollIndicator = false,
   scrollEnabled = true,
 }): React.JSX.Element => {
-  const { theme, currentThemeName } = useTheme();
+  const { theme, isDark } = useTheme();
   const Colors = theme.colors;
   const themedStyles = GlobalStyles(theme);
   const styles = useWrapperStyles();
+
+  const computedBarStyle = React.useMemo(() => {
+    if (statusBarStyle === 'auto') {
+      return isDark ? 'light-content' : 'dark-content';
+    }
+    return statusBarStyle;
+  }, [statusBarStyle, isDark]);
 
   return (
     <View
@@ -47,13 +54,7 @@ export const CommonBox: React.FC<Props> = ({
         moreStyles,
       ]}>
       <StatusBar
-        barStyle={
-          statusBarStyle.length > 0
-            ? statusBarStyle
-            : currentThemeName === 'light'
-            ? 'light-content'
-            : 'light-content'
-        }
+        barStyle={computedBarStyle}
         backgroundColor={Colors.transparent0}
         translucent
       />

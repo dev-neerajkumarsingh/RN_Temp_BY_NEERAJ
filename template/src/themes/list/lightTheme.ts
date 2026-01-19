@@ -2,9 +2,17 @@
 export const lightTheme = {
   name: 'light',
   colors: {
+    // Core
     primary: '#FFFFFF',
-    text2: '#141448',
     secondary: '#001326',
+    background: '#F5F5F5',
+    surface: '#FFFFFF',
+
+    // Text
+    text: '#001326',
+    textSecondary: '#666666',
+
+    // Accent
     tertiary: '#F0F0F0',
     quaternary: '#FF0000',
     quinary: '#00FF00',
@@ -13,26 +21,34 @@ export const lightTheme = {
     octonary: '#000D1A',
     nonary: '#00FFFF',
     denary: '#808081',
+
+    // Transparency
     transparent0: 'rgba(0,0,0,0)',
     transparent8: 'rgba(0,0,0,0.8)',
-    error: '#FF0000',
-    warning: '#FFFF00',
-    info: '#0000FF',
-    success: '#00FF00',
-    lightError: '#fee7e7ff',
-    lightWarning: '#fdfddeff',
-    lightInfo: '#d9d9fcff',
-    lightSuccess: '#d9fbd9ff',
-    disabledBtn: '#808081',
+    overlay: 'rgba(0,0,0,0.5)',
+
+    // Status
+    error: '#DC3545',
+    warning: '#FFC107',
+    info: '#17A2B8',
+    success: '#28A745',
+    lightError: '#fee7e7',
+    lightWarning: '#fdfde0',
+    lightInfo: '#d9e8fc',
+    lightSuccess: '#d9fbd9',
+
+    // UI Elements
+    disabledBtn: '#CCCCCC',
+    disabledText: '#999999',
     white: '#FFFFFF',
-    black: '#000',
-    text1: '#5A6F85',
-    borderColor1: '#E5E5E5',
-    grey1: '#F7F8FA',
-    grey2: '#E8E8E8',
-    lightText: '#627280',
-    headerButtons: '#1B446E',
-    deminBlue: '#021524',
-    cellLine: '#E8E8E8',
+    black: '#000000',
+    borderColor: '#E5E5E5',
+    grey: '#E8E8E8',
+
+    // Input
+    inputBackground: '#FFFFFF',
+    inputBorder: '#E5E5E5',
+    inputBorderFocused: '#0962BC',
+    placeholder: '#999999',
   },
 };
