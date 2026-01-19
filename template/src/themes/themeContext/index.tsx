@@ -1,73 +1,90 @@
-// context/ThemeContext.tsx
-import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { Appearance } from 'react-native';
+// themes/context/ThemeContext.tsx
+
+import * as React from 'react';
+import { useColorScheme, StatusBar } from 'react-native';
 import { lightTheme } from '../list/lightTheme';
 import { darkTheme } from '../list/darkTheme';
 
-type ThemeName = 'light' | 'dark' | 'corporate';
+// Types
+export type ThemeMode = 'light' | 'dark' | 'system';
 type Theme = typeof lightTheme;
 
 interface ThemeContextType {
   theme: Theme;
-  currentThemeName: ThemeName;
-  setTheme: (name: ThemeName) => void;
+  themeMode: ThemeMode;
+  isDark: boolean;
+  setThemeMode: (mode: ThemeMode) => void;
+  toggleTheme: () => void;
 }
 
-export const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+// Context
+const ThemeContext = React.createContext<ThemeContextType | undefined>(undefined);
 
+// Provider Props
 interface ThemeProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
+  initialMode?: ThemeMode;
 }
 
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [currentThemeName, setCurrentThemeName] = useState<ThemeName>(() => {
-    // Initialize currentThemeName once
-    const systemColorScheme = Appearance.getColorScheme();
-    return systemColorScheme === 'dark' ? 'dark' : 'light';
-  });
+// Provider Component
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({
+  children,
+  initialMode = 'system',
+}) => {
+  // Get system color scheme using the hook (automatically updates)
+  const systemColorScheme = useColorScheme();
+  
+  // Track user's theme preference
+  const [themeMode, setThemeModeState] = React.useState<ThemeMode>(initialMode);
 
-  const getTheme = (name: ThemeName): Theme => {
-    switch (name) {
-      case 'light':
-        return lightTheme;
-      case 'dark':
-        return darkTheme;
-      // case 'corporate':
-      //   return corporateTheme;
-      default:
-        return lightTheme;
+  // Determine if dark mode is active
+  const isDark = React.useMemo(() => {
+    if (themeMode === 'system') {
+      return systemColorScheme === 'dark';
     }
-  };
+    return themeMode === 'dark';
+  }, [themeMode, systemColorScheme]);
 
-  const [theme, setThemeState] = useState<Theme>(getTheme(currentThemeName));
+  // Get the actual theme object
+  const theme = React.useMemo(() => {
+    return isDark ? darkTheme : lightTheme;
+  }, [isDark]);
 
-  // Memoize setTheme to ensure it's stable, though useState's setter is already stable
-  // For other functions, useCallback would be needed
-  const setTheme = React.useCallback(
-    (name: ThemeName) => {
-      //console.log('#>> setTheme :: ', name);
-      setCurrentThemeName(name);
-      setThemeState(getTheme(name));
-    },
-    []
-  );
+  // Set theme mode
+  const setThemeMode = React.useCallback((mode: ThemeMode) => {
+    setThemeModeState(mode);
+  }, []);
 
-  useEffect(() => {
-    const subscription = Appearance.addChangeListener(({ colorScheme }) => {
-      //console.log('#>> colorScheme :: ', colorScheme);
-      if (colorScheme) {
-        // Use the memoized setTheme directly from the component scope
-        setTheme(colorScheme === 'dark' ? 'dark' : 'light');
+  // Toggle between light/dark (useful for quick toggle button)
+  const toggleTheme = React.useCallback(() => {
+    setThemeModeState(prev => {
+      if (prev === 'system') {
+        // If on system, toggle to opposite of current system theme
+        return systemColorScheme === 'dark' ? 'light' : 'dark';
       }
+      return prev === 'dark' ? 'light' : 'dark';
     });
-    return () => subscription.remove();
-  }, [setTheme]);
+  }, [systemColorScheme]);
 
-  const contextValue = {
-    theme,
-    currentThemeName,
-    setTheme,
-  };
+  // Update status bar based on theme
+  React.useEffect(() => {
+    StatusBar.setBarStyle(isDark ? 'light-content' : 'dark-content', true);
+    if (StatusBar.setBackgroundColor) {
+      StatusBar.setBackgroundColor(theme.colors.background, true);
+    }
+  }, [isDark, theme.colors.background]);
+
+  // Memoize context value
+  const contextValue = React.useMemo(
+    () => ({
+      theme,
+      themeMode,
+      isDark,
+      setThemeMode,
+      toggleTheme,
+    }),
+    [theme, themeMode, isDark, setThemeMode, toggleTheme]
+  );
 
   return (
     <ThemeContext.Provider value={contextValue}>
@@ -76,9 +93,9 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   );
 };
 
-export const useTheme = () => {
-  const context = useContext(ThemeContext);
-  //console.log('#>> context :: ', context);
+// Hook
+export const useTheme = (): ThemeContextType => {
+  const context = React.useContext(ThemeContext);
   if (context === undefined) {
     throw new Error('useTheme must be used within a ThemeProvider');
   }

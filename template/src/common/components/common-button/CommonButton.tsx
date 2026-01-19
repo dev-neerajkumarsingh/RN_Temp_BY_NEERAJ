@@ -69,7 +69,7 @@ const CommonButtonComponent: React.FC<Props> = ({
   moreButtonStyle,
   contentType = 'text',
   label,
-  textColor = '#fff',
+  textColor,
   textAlign = 'center',
   fontSize = 14,
   lineHeight = (fontSize ?? 14) + 5,
@@ -111,7 +111,7 @@ const CommonButtonComponent: React.FC<Props> = ({
         return (
           <CommonText
             content={label || ''}
-            color={textColor}
+            color={textColor || Colors.primary}
             fontSize={fontSize}
             textAlign={textAlign}
             fontType={fontType as FontTypes | undefined}
