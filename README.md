@@ -12,7 +12,6 @@ A professional, feature-rich, and production-ready boilerplate for React Native 
 
 - Node.js >= 20.x
 - npm or yarn
-- React Native CLI
 - Xcode (for iOS)
 - Android Studio (for Android)
 
