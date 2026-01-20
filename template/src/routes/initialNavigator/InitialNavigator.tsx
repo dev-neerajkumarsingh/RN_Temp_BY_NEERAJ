@@ -14,6 +14,7 @@ import {
 import { navigationRef } from '@hooks';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { QueryProvider } from '@network';
+import { ExampleStacks } from '../rootNavigator/example-stack/ExampleStacks';
 
 export const InitialNavigator = () => {
   return (
@@ -23,7 +24,8 @@ export const InitialNavigator = () => {
           <ThemeProvider>
             <KeyboardProvider>
               <NavigationContainer ref={navigationRef}>
-                <RootNavigator />
+                <ExampleStacks />
+                {/* <RootNavigator /> */}
                 <Loader />
                 <CommonToaster />
                 <CommonPopup />

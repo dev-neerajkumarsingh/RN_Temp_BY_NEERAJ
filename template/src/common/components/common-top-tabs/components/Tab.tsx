@@ -21,15 +21,20 @@ const TabComponent: React.FC<Props> = ({
 }) => {
   const styles = useCommonTabStyles();
 
-  // Memoize tab width calculation
+  // Memoize tab width calculation - auto width for tabType 2 (scrollable)
   const tabWidth = useMemo(() => {
+    if (tabType === 2) {
+      return undefined; // Auto width for scrollable tabs
+    }
     const actualWidth = Pixelate.screenWidth / 1.05;
     return actualWidth / tabsLength;
-  }, [tabsLength]);
+  }, [tabsLength, tabType]);
 
   // Memoize tab style based on active state and type
   const tabStyle = useMemo(() => {
-    const baseStyle = { width: tabWidth };
+    // For tabType 2, use auto width with padding; for tabType 1, use fixed width
+    const baseStyle =
+      tabType === 2 ? { paddingHorizontal: 16 } : { width: tabWidth };
     let stateStyle;
 
     if (activeTab) {
@@ -53,6 +58,7 @@ const TabComponent: React.FC<Props> = ({
         fontSize={activeTab ? 15 : 14}
         fontType={activeTab ? 'InterExtraBold' : 'InterLight'}
         moreStyle={activeTab ? styles.activeText : styles.inactiveText}
+        numberOfLines={1}
       />
     </Pressable>
   );
