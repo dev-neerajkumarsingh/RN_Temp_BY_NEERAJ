@@ -47,14 +47,14 @@ export const CommonDropDownEx = () => {
         styles.tabButton,
         {
           backgroundColor:
-            activeExample === example ? Colors.senary : Colors.grey2,
+            activeExample === example ? Colors.senary : Colors.grey,
         },
       ]}
       onPress={() => setActiveExample(example)}>
       <CommonText
         content={title}
         fontSize={12}
-        color={activeExample === example ? Colors.white : Colors.text2}
+        color={activeExample === example ? Colors.white : Colors.grey}
       />
     </TouchableOpacity>
   );
@@ -75,13 +75,13 @@ export const CommonDropDownEx = () => {
           <CommonText
             content="CommonDropDown Examples"
             fontSize={20}
-            color={Colors.text2}
+            color={Colors.text}
           />
         </View>
         <CommonText
           content="Animated dropdown selector with customization options"
           fontSize={12}
-          color={Colors.text1}
+          color={Colors.text}
           moreStyle={styles.subtitle}
         />
       </View>
@@ -126,8 +126,8 @@ export const CommonDropDownEx = () => {
 
       {/* Code Preview */}
       <View style={styles.codeContainer}>
-        <CommonText content="Usage:" fontSize={14} color={Colors.text2} />
-        <View style={[styles.codeBlock, { backgroundColor: Colors.grey1 }]}>
+        <CommonText content="Usage:" fontSize={14} color={Colors.text} />
+        <View style={[styles.codeBlock, { backgroundColor: Colors.grey }]}>
           <CommonText
             content={getCodeExample(activeExample)}
             fontSize={11}
@@ -157,7 +157,7 @@ const BasicDropDownExample = ({
     <CommonText
       content="Select a Country"
       fontSize={14}
-      color={colors.text2}
+      color={colors.text}
       moreStyle={styles.label}
     />
     <CommonDropDown
@@ -190,7 +190,7 @@ const StyledDropDownExample = ({
     <CommonText
       content="Styled Dropdown"
       fontSize={14}
-      color={colors.text2}
+      color={colors.text}
       moreStyle={styles.label}
     />
     <CommonDropDown
@@ -236,7 +236,7 @@ const MultipleDropDownExample = ({
     <CommonText
       content="Country"
       fontSize={14}
-      color={colors.text2}
+      color={colors.text}
       moreStyle={styles.label}
     />
     <CommonDropDown
@@ -249,7 +249,7 @@ const MultipleDropDownExample = ({
     <CommonText
       content="Priority"
       fontSize={14}
-      color={colors.text2}
+      color={colors.text}
       moreStyle={[styles.label, { marginTop: 20 }]}
     />
     <CommonDropDown

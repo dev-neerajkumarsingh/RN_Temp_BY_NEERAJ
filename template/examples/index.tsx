@@ -26,12 +26,12 @@ export const Examples = () => {
           content={'Component Examples'}
           fontSize={24}
           fontType={'InterExtraBold'}
-          color={Colors.text2}
+          color={Colors.text}
         />
         <CommonText
           content={'Tap on any component to see its usage examples'}
           fontSize={14}
-          color={Colors.text1}
+          color={Colors.text}
           moreStyle={styles.subtitle}
         />
       </View>

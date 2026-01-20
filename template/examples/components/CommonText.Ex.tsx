@@ -40,14 +40,14 @@ export const CommonTextEx = () => {
         styles.tabButton,
         {
           backgroundColor:
-            activeExample === example ? Colors.senary : Colors.grey2,
+            activeExample === example ? Colors.senary : Colors.grey,
         },
       ]}
       onPress={() => setActiveExample(example)}>
       <CommonText
         content={title}
         fontSize={12}
-        color={activeExample === example ? Colors.white : Colors.text2}
+        color={activeExample === example ? Colors.white : Colors.text}
       />
     </TouchableOpacity>
   );
@@ -68,13 +68,13 @@ export const CommonTextEx = () => {
           <CommonText
             content="CommonText Examples"
             fontSize={20}
-            color={Colors.text2}
+            color={Colors.text}
           />
         </View>
         <CommonText
           content="Customizable text with fonts, sizes, colors & alignment"
           fontSize={12}
-          color={Colors.text1}
+          color={Colors.text}
           moreStyle={styles.subtitle}
         />
       </View>
@@ -101,8 +101,8 @@ export const CommonTextEx = () => {
 
       {/* Code Preview */}
       <View style={styles.codeContainer}>
-        <CommonText content="Usage:" fontSize={14} color={Colors.text2} />
-        <View style={[styles.codeBlock, { backgroundColor: Colors.grey1 }]}>
+        <CommonText content="Usage:" fontSize={14} color={Colors.text} />
+        <View style={[styles.codeBlock, { backgroundColor: Colors.grey }]}>
           <CommonText
             content={getCodeExample(activeExample)}
             fontSize={11}
@@ -119,11 +119,11 @@ export const CommonTextEx = () => {
 
 const BasicExample = ({ colors }: { colors: any }) => (
   <View style={styles.demoBox}>
-    <CommonText content="Basic Text" fontSize={16} color={colors.text2} />
+    <CommonText content="Basic Text" fontSize={16} color={colors.text} />
     <CommonText
       content="This is a simple text with default styling"
       fontSize={14}
-      color={colors.text1}
+      color={colors.text}
       moreStyle={styles.demoText}
     />
   </View>
@@ -131,23 +131,23 @@ const BasicExample = ({ colors }: { colors: any }) => (
 
 const SizesExample = ({ colors }: { colors: any }) => (
   <View style={styles.demoBox}>
-    <CommonText content="Small (12px)" fontSize={12} color={colors.text2} />
+    <CommonText content="Small (12px)" fontSize={12} color={colors.text} />
     <CommonText
       content="Medium (16px)"
       fontSize={16}
-      color={colors.text2}
+      color={colors.text}
       moreStyle={styles.demoText}
     />
     <CommonText
       content="Large (20px)"
       fontSize={20}
-      color={colors.text2}
+      color={colors.text}
       moreStyle={styles.demoText}
     />
     <CommonText
       content="Extra Large (24px)"
       fontSize={24}
-      color={colors.text2}
+      color={colors.text}
       moreStyle={styles.demoText}
     />
   </View>
@@ -177,7 +177,7 @@ const ColorsExample = ({ colors }: { colors: any }) => (
     <CommonText
       content="Muted Color"
       fontSize={14}
-      color={colors.text1}
+      color={colors.text}
       moreStyle={styles.demoText}
     />
   </View>
@@ -189,7 +189,7 @@ const AlignmentExample = ({ colors }: { colors: any }) => (
       <CommonText
         content="Left aligned text"
         fontSize={14}
-        color={colors.text2}
+        color={colors.text}
         textAlign="left"
       />
     </View>
@@ -197,7 +197,7 @@ const AlignmentExample = ({ colors }: { colors: any }) => (
       <CommonText
         content="Center aligned text"
         fontSize={14}
-        color={colors.text2}
+        color={colors.text}
         textAlign="center"
       />
     </View>
@@ -205,7 +205,7 @@ const AlignmentExample = ({ colors }: { colors: any }) => (
       <CommonText
         content="Right aligned text"
         fontSize={14}
-        color={colors.text2}
+        color={colors.text}
         textAlign="right"
       />
     </View>
@@ -217,14 +217,14 @@ const TruncationExample = ({ colors }: { colors: any }) => (
     <CommonText
       content="Single line with ellipsis at the end when text is too long to fit"
       fontSize={14}
-      color={colors.text2}
+      color={colors.text}
       numberOfLines={1}
       ellipsizeMode="tail"
     />
     <CommonText
       content="Two lines maximum - This is a longer text that will be truncated after two lines of content are displayed on the screen"
       fontSize={14}
-      color={colors.text1}
+      color={colors.text}
       numberOfLines={2}
       ellipsizeMode="tail"
       moreStyle={styles.demoText}

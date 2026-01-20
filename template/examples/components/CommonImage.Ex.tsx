@@ -40,14 +40,14 @@ export const CommonImageEx = () => {
         styles.tabButton,
         {
           backgroundColor:
-            activeExample === example ? Colors.senary : Colors.grey2,
+            activeExample === example ? Colors.senary : Colors.grey,
         },
       ]}
       onPress={() => setActiveExample(example)}>
       <CommonText
         content={title}
         fontSize={12}
-        color={activeExample === example ? Colors.white : Colors.text2}
+        color={activeExample === example ? Colors.white : Colors.grey}
       />
     </TouchableOpacity>
   );
@@ -68,13 +68,13 @@ export const CommonImageEx = () => {
           <CommonText
             content="CommonImage Examples"
             fontSize={20}
-            color={Colors.text2}
+            color={Colors.text}
           />
         </View>
         <CommonText
           content="SVG icons, URL images with fade-in animation"
           fontSize={12}
-          color={Colors.text1}
+          color={Colors.text}
           moreStyle={styles.subtitle}
         />
       </View>
@@ -97,8 +97,8 @@ export const CommonImageEx = () => {
 
       {/* Code Preview */}
       <View style={styles.codeContainer}>
-        <CommonText content="Usage:" fontSize={14} color={Colors.text2} />
-        <View style={[styles.codeBlock, { backgroundColor: Colors.grey1 }]}>
+        <CommonText content="Usage:" fontSize={14} color={Colors.text} />
+        <View style={[styles.codeBlock, { backgroundColor: Colors.grey }]}>
           <CommonText
             content={getCodeExample(activeExample)}
             fontSize={11}
@@ -118,7 +118,7 @@ const SvgIconsExample = ({ colors }: { colors: any }) => (
     <CommonText
       content="Available SVG Icons"
       fontSize={14}
-      color={colors.text2}
+      color={colors.text}
       moreStyle={styles.sectionTitle}
     />
     <View style={styles.iconGrid}>
@@ -145,7 +145,7 @@ const IconItem = ({
   colors: any;
 }) => (
   <View style={styles.iconItem}>
-    <View style={[styles.iconBox, { backgroundColor: colors.grey1 }]}>
+    <View style={[styles.iconBox, { backgroundColor: colors.grey }]}>
       <CommonImage
         sourceType="localSvg"
         svgSource={icon}
@@ -163,7 +163,7 @@ const UrlImageExample = ({ colors }: { colors: any }) => (
     <CommonText
       content="Images from URL with fade-in animation"
       fontSize={14}
-      color={colors.text2}
+      color={colors.text}
       moreStyle={styles.sectionTitle}
     />
     <View style={styles.urlImagesContainer}>
@@ -204,7 +204,7 @@ const ColorsExample = ({ colors }: { colors: any }) => (
     <CommonText
       content="SVG Icons with Different Colors"
       fontSize={14}
-      color={colors.text2}
+      color={colors.text}
       moreStyle={styles.sectionTitle}
     />
     <View style={styles.colorRow}>
@@ -257,7 +257,7 @@ const SizesExample = ({ colors }: { colors: any }) => (
     <CommonText
       content="Icons at Different Sizes"
       fontSize={14}
-      color={colors.text2}
+      color={colors.text}
       moreStyle={styles.sectionTitle}
     />
     <View style={styles.sizeRow}>

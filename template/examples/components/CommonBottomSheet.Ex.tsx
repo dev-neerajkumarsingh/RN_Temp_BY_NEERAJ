@@ -48,14 +48,14 @@ export const CommonBottomSheetEx = () => {
         styles.tabButton,
         {
           backgroundColor:
-            activeExample === example ? Colors.senary : Colors.grey2,
+            activeExample === example ? Colors.senary : Colors.grey,
         },
       ]}
       onPress={() => setActiveExample(example)}>
       <CommonText
         content={title}
         fontSize={12}
-        color={activeExample === example ? Colors.white : Colors.text2}
+        color={activeExample === example ? Colors.white : Colors.text}
       />
     </TouchableOpacity>
   );
@@ -76,13 +76,13 @@ export const CommonBottomSheetEx = () => {
           <CommonText
             content="CommonBottomSheet Examples"
             fontSize={20}
-            color={Colors.text2}
+            color={Colors.text}
           />
         </View>
         <CommonText
           content="Draggable bottom sheet with gesture support"
           fontSize={12}
-          color={Colors.text1}
+          color={Colors.text}
           moreStyle={styles.subtitle}
         />
       </View>
@@ -119,8 +119,8 @@ export const CommonBottomSheetEx = () => {
 
       {/* Code Preview */}
       <View style={styles.codeContainer}>
-        <CommonText content="Usage:" fontSize={14} color={Colors.text2} />
-        <View style={[styles.codeBlock, { backgroundColor: Colors.grey1 }]}>
+        <CommonText content="Usage:" fontSize={14} color={Colors.text} />
+        <View style={[styles.codeBlock, { backgroundColor: Colors.grey }]}>
           <CommonText
             content={getCodeExample(activeExample)}
             fontSize={11}
@@ -139,12 +139,12 @@ export const CommonBottomSheetEx = () => {
             <CommonText
               content="Basic Bottom Sheet"
               fontSize={18}
-              color={Colors.text2}
+              color={Colors.text}
             />
             <CommonText
               content="Drag down or tap outside to close"
               fontSize={14}
-              color={Colors.text1}
+              color={Colors.text}
               moreStyle={styles.sheetText}
             />
             <CommonButton
@@ -166,27 +166,27 @@ export const CommonBottomSheetEx = () => {
             <CommonText
               content="Scrollable Content"
               fontSize={18}
-              color={Colors.text2}
+              color={Colors.text}
             />
             <CommonText
               content="Scroll down to see more items"
               fontSize={12}
-              color={Colors.text1}
+              color={Colors.text}
               moreStyle={{ marginTop: 4, marginBottom: 8 }}
             />
             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(item => (
               <View
                 key={item}
-                style={[styles.listItem, { backgroundColor: Colors.grey1 }]}>
+                style={[styles.listItem, { backgroundColor: Colors.grey }]}>
                 <CommonText
                   content={`List Item ${item}`}
                   fontSize={14}
-                  color={Colors.text2}
+                  color={Colors.text}
                 />
                 <CommonText
                   content="Tap or scroll to interact"
                   fontSize={11}
-                  color={Colors.text1}
+                  color={Colors.text}
                 />
               </View>
             ))}
@@ -203,32 +203,32 @@ export const CommonBottomSheetEx = () => {
             <CommonText
               content="Quick Action"
               fontSize={18}
-              color={Colors.text2}
+              color={Colors.text}
             />
             <View style={styles.actionButtons}>
               <TouchableOpacity
-                style={[styles.actionButton, { backgroundColor: Colors.grey1 }]}
+                style={[styles.actionButton, { backgroundColor: Colors.grey }]}
                 onPress={() => setShowForm(false)}>
-                <CommonText content="Share" fontSize={14} color={Colors.text2} />
+                <CommonText content="Share" fontSize={14} color={Colors.text} />
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.actionButton, { backgroundColor: Colors.grey1 }]}
+                style={[styles.actionButton, { backgroundColor: Colors.grey }]}
                 onPress={() => setShowForm(false)}>
-                <CommonText content="Copy" fontSize={14} color={Colors.text2} />
+                <CommonText content="Copy" fontSize={14} color={Colors.text} />
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.actionButton, { backgroundColor: Colors.grey1 }]}
+                style={[styles.actionButton, { backgroundColor: Colors.grey }]}
                 onPress={() => setShowForm(false)}>
                 <CommonText content="Delete" fontSize={14} color={Colors.error} />
               </TouchableOpacity>
             </View>
             <CommonButton
               label="Cancel"
-              textColor={Colors.text2}
+              textColor={Colors.text}
               onPress={() => setShowForm(false)}
               moreButtonStyle={[
                 styles.sheetButton,
-                { backgroundColor: Colors.grey2 },
+                { backgroundColor: Colors.grey },
               ]}
             />
           </View>
@@ -241,18 +241,18 @@ export const CommonBottomSheetEx = () => {
         {() => (
           <View style={styles.sheetContent}>
             <View style={styles.dragIndicatorContainer}>
-              <View style={[styles.dragIndicator, { backgroundColor: Colors.grey2 }]} />
+              <View style={[styles.dragIndicator, { backgroundColor: Colors.grey }]} />
             </View>
             <CommonText
               content="Draggable Bottom Sheet"
               fontSize={18}
-              color={Colors.text2}
+              color={Colors.text}
               textAlign="center"
             />
             <CommonText
               content="Try these gestures:"
               fontSize={14}
-              color={Colors.text1}
+              color={Colors.text}
               moreStyle={styles.gestureTitle}
             />
             <View style={styles.gestureList}>
@@ -261,8 +261,8 @@ export const CommonBottomSheetEx = () => {
                   <CommonText content="↓" fontSize={16} color={Colors.white} />
                 </View>
                 <View style={styles.gestureTextContainer}>
-                  <CommonText content="Swipe Down" fontSize={14} color={Colors.text2} />
-                  <CommonText content="Drag down to dismiss the sheet" fontSize={12} color={Colors.text1} />
+                  <CommonText content="Swipe Down" fontSize={14} color={Colors.text} />
+                  <CommonText content="Drag down to dismiss the sheet" fontSize={12} color={Colors.text} />
                 </View>
               </View>
               <View style={styles.gestureItem}>
@@ -270,8 +270,8 @@ export const CommonBottomSheetEx = () => {
                   <CommonText content="↑" fontSize={16} color={Colors.white} />
                 </View>
                 <View style={styles.gestureTextContainer}>
-                  <CommonText content="Swipe Up" fontSize={14} color={Colors.text2} />
-                  <CommonText content="Sheet snaps back to position" fontSize={12} color={Colors.text1} />
+                  <CommonText content="Swipe Up" fontSize={14} color={Colors.text} />
+                  <CommonText content="Sheet snaps back to position" fontSize={12} color={Colors.text} />
                 </View>
               </View>
               <View style={styles.gestureItem}>
@@ -279,17 +279,17 @@ export const CommonBottomSheetEx = () => {
                   <CommonText content="⚡" fontSize={16} color={Colors.white} />
                 </View>
                 <View style={styles.gestureTextContainer}>
-                  <CommonText content="Quick Flick" fontSize={14} color={Colors.text2} />
-                  <CommonText content="Fast swipe dismisses instantly" fontSize={12} color={Colors.text1} />
+                  <CommonText content="Quick Flick" fontSize={14} color={Colors.text} />
+                  <CommonText content="Fast swipe dismisses instantly" fontSize={12} color={Colors.text} />
                 </View>
               </View>
               <View style={styles.gestureItem}>
-                <View style={[styles.gestureIcon, { backgroundColor: Colors.grey2 }]}>
-                  <CommonText content="◐" fontSize={16} color={Colors.text2} />
+                <View style={[styles.gestureIcon, { backgroundColor: Colors.grey }]}>
+                  <CommonText content="◐" fontSize={16} color={Colors.text} />
                 </View>
                 <View style={styles.gestureTextContainer}>
-                  <CommonText content="Tap Overlay" fontSize={14} color={Colors.text2} />
-                  <CommonText content="Tap outside to close" fontSize={12} color={Colors.text1} />
+                  <CommonText content="Tap Overlay" fontSize={14} color={Colors.text} />
+                  <CommonText content="Tap outside to close" fontSize={12} color={Colors.text} />
                 </View>
               </View>
             </View>
@@ -318,13 +318,13 @@ const BasicSheetExample = ({
     <CommonText
       content="Basic Bottom Sheet"
       fontSize={14}
-      color={colors.text2}
+      color={colors.text}
       moreStyle={styles.label}
     />
     <CommonText
       content="A simple bottom sheet that slides up from the bottom with drag-to-dismiss gesture support."
       fontSize={12}
-      color={colors.text1}
+      color={colors.text}
       moreStyle={styles.description}
     />
     <CommonButton label="Open Basic Sheet" onPress={onOpen} />
@@ -342,20 +342,20 @@ const DraggableSheetExample = ({
     <CommonText
       content="Draggable Bottom Sheet"
       fontSize={14}
-      color={colors.text2}
+      color={colors.text}
       moreStyle={styles.label}
     />
     <CommonText
       content="Interactive demo showing all gesture controls. The sheet can be dismissed by dragging down past the threshold or with a quick flick gesture."
       fontSize={12}
-      color={colors.text1}
+      color={colors.text}
       moreStyle={styles.description}
     />
-    <View style={[styles.featureList, { backgroundColor: colors.grey1 }]}>
-      <CommonText content="• Pan gesture with spring physics" fontSize={12} color={colors.text2} />
-      <CommonText content="• Velocity-based dismiss detection" fontSize={12} color={colors.text2} />
-      <CommonText content="• Smooth animated transitions" fontSize={12} color={colors.text2} />
-      <CommonText content="• Overlay tap to close" fontSize={12} color={colors.text2} />
+    <View style={[styles.featureList, { backgroundColor: colors.grey }]}>
+      <CommonText content="• Pan gesture with spring physics" fontSize={12} color={colors.text} />
+      <CommonText content="• Velocity-based dismiss detection" fontSize={12} color={colors.text} />
+      <CommonText content="• Smooth animated transitions" fontSize={12} color={colors.text} />
+      <CommonText content="• Overlay tap to close" fontSize={12} color={colors.text} />
     </View>
     <CommonButton label="Try Draggable Sheet" onPress={onOpen} />
   </View>
@@ -372,13 +372,13 @@ const ScrollableSheetExample = ({
     <CommonText
       content="Scrollable Bottom Sheet"
       fontSize={14}
-      color={colors.text2}
+      color={colors.text}
       moreStyle={styles.label}
     />
     <CommonText
       content="Use isScrollable={true} for content that needs scrolling. The drag handle stays fixed at top."
       fontSize={12}
-      color={colors.text1}
+      color={colors.text}
       moreStyle={styles.description}
     />
     <CommonButton label="Open Scrollable Sheet" onPress={onOpen} />
@@ -396,13 +396,13 @@ const FormSheetExample = ({
     <CommonText
       content="Action Sheet"
       fontSize={14}
-      color={colors.text2}
+      color={colors.text}
       moreStyle={styles.label}
     />
     <CommonText
       content="Bottom sheets work great for action menus, quick forms, and confirmation dialogs."
       fontSize={12}
-      color={colors.text1}
+      color={colors.text}
       moreStyle={styles.description}
     />
     <CommonButton label="Open Action Sheet" onPress={onOpen} />

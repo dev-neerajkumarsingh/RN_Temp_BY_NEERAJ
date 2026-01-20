@@ -47,14 +47,14 @@ export const CommonInputEx = () => {
         styles.tabButton,
         {
           backgroundColor:
-            activeExample === example ? Colors.senary : Colors.grey2,
+            activeExample === example ? Colors.senary : Colors.grey,
         },
       ]}
       onPress={() => setActiveExample(example)}>
       <CommonText
         content={title}
         fontSize={12}
-        color={activeExample === example ? Colors.white : Colors.text2}
+        color={activeExample === example ? Colors.white : Colors.text}
       />
     </TouchableOpacity>
   );
@@ -75,13 +75,13 @@ export const CommonInputEx = () => {
           <CommonText
             content="CommonInput Examples"
             fontSize={20}
-            color={Colors.text2}
+            color={Colors.text}
           />
         </View>
         <CommonText
           content="Text inputs with icons, validation & password support"
           fontSize={12}
-          color={Colors.text1}
+          color={Colors.text}
           moreStyle={styles.subtitle}
         />
       </View>
@@ -132,8 +132,8 @@ export const CommonInputEx = () => {
 
       {/* Code Preview */}
       <View style={styles.codeContainer}>
-        <CommonText content="Usage:" fontSize={14} color={Colors.text2} />
-        <View style={[styles.codeBlock, { backgroundColor: Colors.grey1 }]}>
+        <CommonText content="Usage:" fontSize={14} color={Colors.text} />
+        <View style={[styles.codeBlock, { backgroundColor: Colors.grey }]}>
           <CommonText
             content={getCodeExample(activeExample)}
             fontSize={11}
@@ -162,6 +162,7 @@ const BasicInputExample = ({
       placeholder="Enter your name"
       value={value}
       onChangeText={onChange}
+      enableFloatingLabel
     />
     <CommonText
       content={`Current value: ${value || '(empty)'}`}
