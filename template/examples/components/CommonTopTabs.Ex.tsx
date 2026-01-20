@@ -46,14 +46,14 @@ export const CommonTopTabsEx = () => {
         styles.tabButton,
         {
           backgroundColor:
-            activeExample === example ? Colors.senary : Colors.grey2,
+            activeExample === example ? Colors.senary : Colors.grey,
         },
       ]}
       onPress={() => setActiveExample(example)}>
       <CommonText
         content={title}
         fontSize={12}
-        color={activeExample === example ? Colors.white : Colors.text2}
+        color={activeExample === example ? Colors.white : Colors.text}
       />
     </TouchableOpacity>
   );
@@ -74,13 +74,13 @@ export const CommonTopTabsEx = () => {
           <CommonText
             content="CommonTopTabs Examples"
             fontSize={20}
-            color={Colors.text2}
+            color={Colors.text}
           />
         </View>
         <CommonText
           content="Tab navigation with different style variants"
           fontSize={12}
-          color={Colors.text1}
+          color={Colors.text}
           moreStyle={styles.subtitle}
         />
       </View>
@@ -122,8 +122,8 @@ export const CommonTopTabsEx = () => {
 
       {/* Code Preview */}
       <View style={styles.codeContainer}>
-        <CommonText content="Usage:" fontSize={14} color={Colors.text2} />
-        <View style={[styles.codeBlock, { backgroundColor: Colors.grey1 }]}>
+        <CommonText content="Usage:" fontSize={14} color={Colors.text} />
+        <View style={[styles.codeBlock, { backgroundColor: Colors.grey }]}>
           <CommonText
             content={getCodeExample(activeExample)}
             fontSize={11}
@@ -153,7 +153,7 @@ const Type1Example = ({
     <CommonText
       content="Tab Type 1 (Default)"
       fontSize={14}
-      color={colors.text2}
+      color={colors.text}
       moreStyle={styles.label}
     />
     <CommonTopTabs
@@ -165,7 +165,7 @@ const Type1Example = ({
     <CommonText
       content={`Active: ${activeTab}`}
       fontSize={12}
-      color={colors.text1}
+      color={colors.text}
       moreStyle={styles.helperText}
       textAlign="center"
     />
@@ -187,13 +187,13 @@ const Type2Example = ({
     <CommonText
       content="Tab Type 2 (Scrollable)"
       fontSize={14}
-      color={colors.text2}
+      color={colors.text}
       moreStyle={styles.label}
     />
     <CommonText
       content="Swipe horizontally to see more tabs"
       fontSize={12}
-      color={colors.text1}
+      color={colors.text}
       moreStyle={styles.scrollHint}
     />
     <ScrollView
@@ -210,7 +210,7 @@ const Type2Example = ({
     <CommonText
       content={`Active: ${activeTab}`}
       fontSize={12}
-      color={colors.text1}
+      color={colors.text}
       moreStyle={styles.helperText}
       textAlign="center"
     />
@@ -235,36 +235,36 @@ const ContentExample = ({
       tabType={1}
       onChangeTab={onChangeTab}
     />
-    <View style={[styles.contentBox, { backgroundColor: colors.grey1 }]}>
+    <View style={[styles.contentBox, { backgroundColor: colors.grey }]}>
       {activeTab === 'Home' && (
         <View style={styles.contentInner}>
-          <CommonText content="Home Content" fontSize={16} color={colors.text2} />
+          <CommonText content="Home Content" fontSize={16} color={colors.text} />
           <CommonText
             content="This is the home tab content"
             fontSize={12}
-            color={colors.text1}
+            color={colors.text}
             moreStyle={styles.contentText}
           />
         </View>
       )}
       {activeTab === 'Profile' && (
         <View style={styles.contentInner}>
-          <CommonText content="Profile Content" fontSize={16} color={colors.text2} />
+          <CommonText content="Profile Content" fontSize={16} color={colors.text} />
           <CommonText
             content="This is the profile tab content"
             fontSize={12}
-            color={colors.text1}
+            color={colors.text}
             moreStyle={styles.contentText}
           />
         </View>
       )}
       {activeTab === 'Settings' && (
         <View style={styles.contentInner}>
-          <CommonText content="Settings Content" fontSize={16} color={colors.text2} />
+          <CommonText content="Settings Content" fontSize={16} color={colors.text} />
           <CommonText
             content="This is the settings tab content"
             fontSize={12}
-            color={colors.text1}
+            color={colors.text}
             moreStyle={styles.contentText}
           />
         </View>

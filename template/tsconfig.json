@@ -19,7 +19,6 @@
       "@themes": ["./src/themes/index.ts"],
       "@utils": ["./src/utils/index.ts"]
     },
-    "ignoreDeprecations": "6.0"
   },
   "include": [
     "**/*.ts",

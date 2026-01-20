@@ -2,8 +2,260 @@
 
 A professional, feature-rich, and production-ready boilerplate for React Native applications. Built with TypeScript, this template provides a solid foundation with best practices, optimized performance, and a comprehensive set of reusable components.
 
+[![React Native](https://img.shields.io/badge/React%20Native-0.81.5-blue.svg)](https://reactnative.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue.svg)](https://www.typescriptlang.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+---
+
+## Examples
+
+> Quick examples to get you started with the most commonly used components.
+
+### CommonButton
+
+<img src="screenshots/CommonButtonEx.png" alt="CommonButton Example" width="300"/>
+
+```tsx
+import { CommonButton } from '@components';
+
+// Text button
+<CommonButton
+  label="Submit"
+  onPress={handleSubmit}
+  width="100%"
+  height={48}
+/>
+
+// With loading state
+<CommonButton
+  label="Submit"
+  loader={isLoading}
+  disabled={isLoading}
+  onPress={handleSubmit}
+/>
+
+// Icon button
+<CommonButton
+  contentType="localSvg"
+  svgType="arrowleft"
+  svgColor="#fff"
+  imgWidth={24}
+  imgHeight={24}
+  onPress={handleBack}
+/>
+```
+
+### CommonInput
+
+<img src="screenshots/CommonInputEx.png" alt="CommonInput Example" width="300"/>
+
+```tsx
+import { CommonInput } from '@components';
+
+// Email input
+<CommonInput
+  placeholder="Enter email"
+  value={email}
+  onChangeText={setEmail}
+  keyboardType="email-address"
+  leftIcon="email"
+  msgError={emailError}
+/>
+
+// Password input with toggle
+<CommonInput
+  placeholder="Password"
+  value={password}
+  onChangeText={setPassword}
+  secureTextEntry={!showPassword}
+  rightIcon={showPassword ? 'eye_show' : 'eye_hide'}
+  onPressRightIcon={() => setShowPassword(!showPassword)}
+/>
+```
+
+### CommonText
+
+<img src="screenshots/CommonTextEx.png" alt="CommonText Example" width="300"/>
+
+```tsx
+import { CommonText } from '@components';
+
+<CommonText
+  content="Hello World"
+  fontSize={16}
+  fontType="InterBold"
+  color="#333"
+  textAlign="center"
+/>
+```
+
+### CommonImage
+
+<img src="screenshots/CommonImageEx.png" alt="CommonImage Example" width="300"/>
+
+```tsx
+import { CommonImage } from '@components';
+
+// SVG icon
+<CommonImage
+  sourceType="localSvg"
+  svgSource="arrowleft"
+  width={24}
+  height={24}
+  color="#000"
+/>
+
+// Remote image
+<CommonImage
+  sourceType="url"
+  source="https://example.com/image.jpg"
+  width={200}
+  height={150}
+  resizeMode="cover"
+/>
+```
+
+### CommonBox
+
+<img src="screenshots/CommonBoxEx.png" alt="CommonBox Example" width="300"/>
+
+```tsx
+import { CommonBox } from '@components';
+
+// Basic usage
+<CommonBox>
+  <YourContent />
+</CommonBox>
+
+// With scroll and keyboard avoidance
+<CommonBox
+  useScrollView
+  useKeyboardAvoidingView
+  statusBarStyle="light-content"
+>
+  <YourFormContent />
+</CommonBox>
+```
+
+### CommonBottomSheet
+
+<img src="screenshots/CommonBottomSheetEx.png" alt="CommonBottomSheet Example" width="300"/>
+
+```tsx
+import { CommonBottomSheet } from '@components';
+
+<CommonBottomSheet
+  isVisible={showSheet}
+  onClose={() => setShowSheet(false)}
+  isScrollable={true}
+>
+  {() => <YourContent />}
+</CommonBottomSheet>
+```
+
+### CommonDropDown
+
+<img src="screenshots/CommonDropDownEx.png" alt="CommonDropDown Example" width="300"/>
+
+```tsx
+import { CommonDropDown } from '@components';
+
+<CommonDropDown
+  initialData={['Option 1', 'Option 2', 'Option 3']}
+  selectedValue={selected}
+  onPressSelected={setSelected}
+  highLightSelectedValue
+/>
+```
+
+### CommonTopTabs
+
+<img src="screenshots/CommonTopTabsEx.png" alt="CommonTopTabs Example" width="300"/>
+
+```tsx
+import { CommonTopTabs } from '@components';
+
+<CommonTopTabs
+  tabs={['Home', 'Profile', 'Settings']}
+  activeTab={activeTab}
+  onChangeTab={setActiveTab}
+  tabType={1}
+/>
+```
+
+### Toast Notifications
+
+```tsx
+import { useAppDispatch, showToast } from '@redux';
+
+const dispatch = useAppDispatch();
+
+// Show success toast
+dispatch(showToast({
+  type: 'success',
+  title: 'Success!',
+  message: 'Operation completed',
+  duration: 3000,
+}));
+
+// Toast types: 'success' | 'error' | 'info' | 'warn'
+```
+
+### Navigation
+
+```tsx
+import { useNavs } from '@hooks';
+
+const { navigate, goback, reset, push, replace, pop } = useNavs();
+
+navigate('Home', { userId: 123 });
+goback();
+reset('Login');
+```
+
+### Form Validation
+
+```tsx
+import { useValidators } from '@hooks';
+
+const emailResult = useValidators.email('test@example.com');
+// { status: true, msg: '' } or { status: false, msg: 'Email ID is not valid' }
+
+const passwordResult = useValidators.password('Test@123');
+// Requires: min 8 chars, 1 uppercase, 1 number, 1 special char
+```
+
+### Theming
+
+```tsx
+import { useTheme } from '@themes';
+
+const { theme, currentThemeName, setTheme } = useTheme();
+
+<View style={{ backgroundColor: theme.colors.primary }}>
+  <Text style={{ color: theme.colors.text1 }}>Themed Text</Text>
+</View>
+```
+
+### API Calls with React Query
+
+```tsx
+import { useLoginMutation } from '@network';
+
+const loginMutation = useLoginMutation({
+  onSuccess: (data) => dispatch(loginReducer(data)),
+  onError: (error) => console.error(error),
+});
+
+loginMutation.mutate({ email, password });
+```
+
+---
+
 ## Table of Contents
 
+- [Examples](#examples)
 - [Tech Stack](#tech-stack)
 - [Features](#features)
 - [Project Structure](#project-structure)
