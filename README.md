@@ -6,6 +6,166 @@ A professional, feature-rich, and production-ready boilerplate for React Native 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue.svg)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
+## Getting Started
+
+### Prerequisites
+
+- Node.js >= 20.x
+- npm or yarn
+- React Native CLI
+- Xcode (for iOS)
+- Android Studio (for Android)
+
+### Installation
+
+```bash
+# Clone the repository
+npx @react-native-community/cli init <YOUR-APP-NAME> --template "https://github.com/dev-neerajkumarsingh/RN_Temp_BY_NEERAJ.git"
+
+# Navigate to your project directory
+cd <project-directory>/<YOUR-APP-NAME>
+
+# Install dependencies
+npm run deep-clean
+```
+
+### Running the App
+
+```bash
+# Start Metro bundler
+npm start
+
+# Run on Android
+npm run android
+
+# Run on iOS
+npm run ios
+```
+
+---
+
+## Table of Contents
+
+- [Getting Started](#getting-started)
+- [Tech Stack](#tech-stack)
+- [Features](#features)
+- [Project Structure](#project-structure)
+- [Examples](#examples)
+- [Components](#components)
+- [State Management](#state-management)
+- [Networking Layer](#networking-layer)
+- [Navigation](#navigation)
+- [Theming](#theming)
+- [Hooks](#hooks)
+- [Utilities](#utilities)
+- [Security](#security)
+- [Scripts](#scripts)
+
+---
+
+## Tech Stack
+
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| React Native | 0.81.5 | Mobile framework |
+| React | 19.1.0 | UI library |
+| TypeScript | Strict mode | Type safety |
+| Redux Toolkit | Latest | Global state management |
+| Redux Persist | Latest | State persistence |
+| TanStack Query | Latest | Server state & caching |
+| React Navigation 7 | Latest | Navigation |
+| Axios | Latest | HTTP client |
+| React Native Reanimated | Latest | Animations |
+| React Native Keychain | Latest | Secure storage |
+
+---
+
+## Features
+
+### Core Features
+- **TypeScript** - Full type safety with strict mode enabled
+- **State Management** - Redux Toolkit with encrypted persistence
+- **Server State** - TanStack Query for caching, background refetch, and synchronization
+- **Secure Storage** - Hardware-backed keychain storage for sensitive data
+- **End-to-End Encryption** - AES-256-CBC encryption for API communication
+- **Theme Support** - Light/dark themes with system preference detection
+- **Responsive Design** - Percentage and aspect-ratio based sizing utilities
+
+### UI Components
+- Pre-built, memoized, and reusable components
+- Full SVG support with dynamic colors
+- Keyboard-aware views and inputs
+- Modal system (popups, bottom sheets, image viewer)
+- Toast notifications with multiple variants
+- Loading indicators (global and local)
+
+### Developer Experience
+- Path aliases for clean imports (`@components`, `@hooks`, etc.)
+- ESLint and Prettier pre-configured
+- Jest setup for testing
+- Comprehensive TypeScript types
+
+---
+
+## Project Structure
+
+```
+src/
+├── assets/                    # Static assets
+│   ├── fonts/                 # Custom fonts (Inter family)
+│   └── icons/                 # SVG icon library
+│
+├── common/                    # Shared code
+│   ├── components/            # Reusable UI components
+│   │   ├── animation-samples/ # Animation examples
+│   │   ├── common-bottom-sheet/
+│   │   ├── common-button/
+│   │   ├── common-drop-down/
+│   │   ├── common-image/
+│   │   ├── common-input/
+│   │   ├── common-modals/
+│   │   ├── common-popup/
+│   │   ├── common-text/
+│   │   ├── common-toast/
+│   │   ├── common-top-tabs/
+│   │   ├── common-wrapper/
+│   │   └── loader/
+│   ├── constants/             # App constants and URLs
+│   └── hooks/                 # Custom React hooks
+│
+├── network/                   # API layer
+│   ├── apis/                  # Endpoints and services
+│   │   ├── endpoints/         # API endpoint definitions
+│   │   └── services/          # API service functions
+│   ├── middleware/            # Network manager
+│   └── networkCache/          # React Query configuration
+│
+├── redux/                     # State management
+│   ├── encryption/            # Keychain storage adapter
+│   ├── reducers/              # Redux slices
+│   ├── reduxHooks/            # Typed hooks
+│   └── store/                 # Store configuration
+│
+├── routes/                    # Navigation
+│   ├── initialNavigator/      # App entry point
+│   └── rootNavigator/         # Stack navigators
+│
+├── screens/                   # Screen components
+│   ├── app/                   # Authenticated screens
+│   ├── auth/                  # Authentication screens
+│   └── splash/                # Splash screen
+│
+├── themes/                    # Theming
+│   ├── globalStyles/          # Global style utilities
+│   ├── list/                  # Theme definitions
+│   └── themeContext/          # Theme provider
+│
+└── utils/                     # Utilities
+    ├── pixelate/              # Screen dimension utilities
+    ├── responsiveUtils/       # Responsive sizing
+    └── utils-func/            # Helper functions
+```
+
 ---
 
 ## Examples
@@ -249,168 +409,6 @@ const loginMutation = useLoginMutation({
 });
 
 loginMutation.mutate({ email, password });
-```
-
----
-
-## Table of Contents
-
-- [Examples](#examples)
-- [Tech Stack](#tech-stack)
-- [Features](#features)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Components](#components)
-- [State Management](#state-management)
-- [Networking Layer](#networking-layer)
-- [Navigation](#navigation)
-- [Theming](#theming)
-- [Hooks](#hooks)
-- [Utilities](#utilities)
-- [Security](#security)
-- [Scripts](#scripts)
-
----
-
-## Tech Stack
-
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| React Native | 0.81.5 | Mobile framework |
-| React | 19.1.0 | UI library |
-| TypeScript | Strict mode | Type safety |
-| Redux Toolkit | Latest | Global state management |
-| Redux Persist | Latest | State persistence |
-| TanStack Query | Latest | Server state & caching |
-| React Navigation 7 | Latest | Navigation |
-| Axios | Latest | HTTP client |
-| React Native Reanimated | Latest | Animations |
-| React Native Keychain | Latest | Secure storage |
-
----
-
-## Features
-
-### Core Features
-- **TypeScript** - Full type safety with strict mode enabled
-- **State Management** - Redux Toolkit with encrypted persistence
-- **Server State** - TanStack Query for caching, background refetch, and synchronization
-- **Secure Storage** - Hardware-backed keychain storage for sensitive data
-- **End-to-End Encryption** - AES-256-CBC encryption for API communication
-- **Theme Support** - Light/dark themes with system preference detection
-- **Responsive Design** - Percentage and aspect-ratio based sizing utilities
-
-### UI Components
-- Pre-built, memoized, and reusable components
-- Full SVG support with dynamic colors
-- Keyboard-aware views and inputs
-- Modal system (popups, bottom sheets, image viewer)
-- Toast notifications with multiple variants
-- Loading indicators (global and local)
-
-### Developer Experience
-- Path aliases for clean imports (`@components`, `@hooks`, etc.)
-- ESLint and Prettier pre-configured
-- Jest setup for testing
-- Comprehensive TypeScript types
-
----
-
-## Project Structure
-
-```
-src/
-├── assets/                    # Static assets
-│   ├── fonts/                 # Custom fonts (Inter family)
-│   └── icons/                 # SVG icon library
-│
-├── common/                    # Shared code
-│   ├── components/            # Reusable UI components
-│   │   ├── animation-samples/ # Animation examples
-│   │   ├── common-bottom-sheet/
-│   │   ├── common-button/
-│   │   ├── common-drop-down/
-│   │   ├── common-image/
-│   │   ├── common-input/
-│   │   ├── common-modals/
-│   │   ├── common-popup/
-│   │   ├── common-text/
-│   │   ├── common-toast/
-│   │   ├── common-top-tabs/
-│   │   ├── common-wrapper/
-│   │   └── loader/
-│   ├── constants/             # App constants and URLs
-│   └── hooks/                 # Custom React hooks
-│
-├── network/                   # API layer
-│   ├── apis/                  # Endpoints and services
-│   │   ├── endpoints/         # API endpoint definitions
-│   │   └── services/          # API service functions
-│   ├── middleware/            # Network manager
-│   └── networkCache/          # React Query configuration
-│
-├── redux/                     # State management
-│   ├── encryption/            # Keychain storage adapter
-│   ├── reducers/              # Redux slices
-│   ├── reduxHooks/            # Typed hooks
-│   └── store/                 # Store configuration
-│
-├── routes/                    # Navigation
-│   ├── initialNavigator/      # App entry point
-│   └── rootNavigator/         # Stack navigators
-│
-├── screens/                   # Screen components
-│   ├── app/                   # Authenticated screens
-│   ├── auth/                  # Authentication screens
-│   └── splash/                # Splash screen
-│
-├── themes/                    # Theming
-│   ├── globalStyles/          # Global style utilities
-│   ├── list/                  # Theme definitions
-│   └── themeContext/          # Theme provider
-│
-└── utils/                     # Utilities
-    ├── pixelate/              # Screen dimension utilities
-    ├── responsiveUtils/       # Responsive sizing
-    └── utils-func/            # Helper functions
-```
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js >= 20.x
-- npm or yarn
-- React Native CLI
-- Xcode (for iOS)
-- Android Studio (for Android)
-
-### Installation
-
-```bash
-# Clone the repository
-npx @react-native-community/cli init <YOUR-APP-NAME> --template "https://github.com/dev-neerajkumarsingh/RN_Temp_BY_NEERAJ.git"
-
-# Navigate to your project directory
-cd <project-directory>/<YOUR-APP-NAME>
-
-# Install dependencies
-npm run deep-clean
-```
-
-### Running the App
-
-```bash
-# Start Metro bundler
-npm start
-
-# Run on Android
-npm run android
-
-# Run on iOS
-npm run ios
 ```
 
 ---
