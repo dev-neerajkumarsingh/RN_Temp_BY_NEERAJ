@@ -108,6 +108,7 @@ export const Login = () => {
             setStates(prev => ({ ...prev, email: text }))
           }
           moreContainerStyle={styles.input1}
+          enableFloatingLabel
         />
         <CommonInput
           placeholder="Enter your name2"
@@ -117,6 +118,7 @@ export const Login = () => {
             setStates(prev => ({ ...prev, password: text }))
           }
           moreContainerStyle={styles.input2}
+          enableFloatingLabel
         />
       </CommonBox>
       <CommonKeyboardStickyView>

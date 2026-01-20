@@ -1,6 +1,4 @@
 import * as React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { RootNavigator } from '../rootNavigator/RootNavigator';
 import { Provider } from 'react-redux';
 import { store, persistor } from '@redux';
 import { PersistGate } from 'redux-persist/integration/react';
@@ -11,10 +9,11 @@ import {
   CommonPopup,
   CommonErrorScreen,
 } from '@components';
-import { navigationRef } from '@hooks';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { QueryProvider } from '@network';
+import { ThemedNavigationContainer } from './components/ThemedNavigationContainer';
 import { ExampleStacks } from '../rootNavigator/example-stack/ExampleStacks';
+import { RootNavigator } from '../rootNavigator/RootNavigator'; // Add this import back when using RootNavigator
 
 export const InitialNavigator = () => {
   return (
@@ -23,14 +22,14 @@ export const InitialNavigator = () => {
         <QueryProvider>
           <ThemeProvider>
             <KeyboardProvider>
-              <NavigationContainer ref={navigationRef}>
+              <ThemedNavigationContainer>
                 <ExampleStacks />
                 {/* <RootNavigator /> */}
                 <Loader />
                 <CommonToaster />
                 <CommonPopup />
                 <CommonErrorScreen />
-              </NavigationContainer>
+              </ThemedNavigationContainer>
             </KeyboardProvider>
           </ThemeProvider>
         </QueryProvider>

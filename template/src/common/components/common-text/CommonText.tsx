@@ -3,6 +3,7 @@ import { Text, StyleProp, TextStyle } from 'react-native';
 import type { FontTypes } from '@fonts';
 import * as Fonts from '@fonts';
 import { Pixelate } from '@utils';
+import { useTheme } from '@themes';
 
 type Props = {
   content: string;
@@ -20,7 +21,7 @@ type Props = {
 
 const CommonTextComponent: React.FC<Props> = ({
   content,
-  color = 'black',
+  color,
   textAlign = 'left',
   fontSize = 14,
   lineHeight = fontSize + 5,
@@ -31,11 +32,13 @@ const CommonTextComponent: React.FC<Props> = ({
   numberOfLines,
   ellipsizeMode,
 }) => {
+  const { theme } = useTheme();
+  const Colors = theme.colors;
   // Memoize text styles to prevent recalculation on every render
   const textStyle = React.useMemo(
     () => [
       {
-        color,
+        color: color || Colors.text,
         textAlign,
         fontSize: Pixelate.fontPixel(fontSize),
         lineHeight: Pixelate.fontPixel(lineHeight),
@@ -43,7 +46,7 @@ const CommonTextComponent: React.FC<Props> = ({
       { fontFamily: Fonts[fontType as keyof typeof Fonts] || fontType },
       moreStyle,
     ],
-    [color, textAlign, fontSize, lineHeight, fontType, moreStyle]
+    [color, textAlign, fontSize, lineHeight, fontType, moreStyle],
   );
 
   return (
