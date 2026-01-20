@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { RootNavigator } from '../rootNavigator/RootNavigator';
 import { Provider } from 'react-redux';
 import { store, persistor } from '@redux';
 import { PersistGate } from 'redux-persist/integration/react';
@@ -13,6 +12,8 @@ import {
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { QueryProvider } from '@network';
 import { ThemedNavigationContainer } from './components/ThemedNavigationContainer';
+import { ExampleStacks } from '../rootNavigator/example-stack/ExampleStacks';
+import { RootNavigator } from '../rootNavigator/RootNavigator'; // Add this import back when using RootNavigator
 
 export const InitialNavigator = () => {
   return (
@@ -22,7 +23,8 @@ export const InitialNavigator = () => {
           <ThemeProvider>
             <KeyboardProvider>
               <ThemedNavigationContainer>
-                <RootNavigator />
+                <ExampleStacks />
+                {/* <RootNavigator /> */}
                 <Loader />
                 <CommonToaster />
                 <CommonPopup />
