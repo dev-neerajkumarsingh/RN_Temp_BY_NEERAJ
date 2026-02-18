@@ -1,13 +1,32 @@
 stages:
-  - lint-checks
+  - compliance
+  - code-quality
+  - structural-review
+  - ai-review
 
-# Global variables for the pipeline
+# ══════════════════════════════════════════════════════════════════════
+# Global configuration
+# ══════════════════════════════════════════════════════════════════════
+
 variables:
-  GIT_DEPTH: "0" # Required to analyze commit history and branch diffs
+  GIT_DEPTH: "0" # Full history for branch diff analysis
 
-# Standardized job for all MR compliance rules
+# Cache node_modules across jobs in the same pipeline
+.node_cache: &node_cache
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - node_modules/
+    policy: pull
+
+# ══════════════════════════════════════════════════════════════════════
+# STAGE 1: COMPLIANCE CHECKS (lightweight — alpine, no node_modules)
+# ══════════════════════════════════════════════════════════════════════
+
 compliance_checks:
-  stage: lint-checks
+  stage: compliance
   image: alpine:latest
   before_script:
     - apk add --no-cache git bash
@@ -15,7 +34,7 @@ compliance_checks:
   script:
     - echo "🚀 Starting Compliance Checks for MR..."
 
-    # --- 1. BRANCH NAMING CONVENTION CHECK ---
+    # --- 1. BRANCH NAMING CONVENTION ---
     - echo "🔍 Checking branch naming convention..."
     - |
       if [[ ! "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME" =~ ^(feature/|bugFix/) ]]; then
@@ -25,7 +44,7 @@ compliance_checks:
       fi
     - echo "✅ Branch name follows guidelines."
 
-    # --- 2. MR SIZE LIMIT CHECK (50 FILES) ---
+    # --- 2. MR SIZE LIMIT (50 FILES) ---
     - echo "🔍 Checking MR size..."
     - COUNTABLE_FILES=$(git diff --name-only origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME...$CI_COMMIT_SHA | grep -vE '\.(png|jpg|jpeg|gif|webp|svg|ttf|otf|woff|woff2)$' | wc -l)
     - |
@@ -36,13 +55,12 @@ compliance_checks:
       fi
     - echo "✅ MR size is within limits ($COUNTABLE_FILES files)."
 
-    # --- 3. CONVENTIONAL COMMITS CHECK ---
+    # --- 3. CONVENTIONAL COMMITS ---
     - echo "🔍 Checking commit message formats..."
-    # Gets all commit messages unique to this feature branch
     - COMMITS=$(git log origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME..$CI_COMMIT_SHA --pretty=format:"%s")
     - |
       while IFS= read -r msg; do
-        if [[ ! "$msg" =~ ^(feat|fix|chore|docs|style|refactor|perf|test)(\(.*\))?!?: .+$ ]]; then
+        if [[ ! "$msg" =~ ^(feat|fix|chore|docs|style|refactor|perf|test)(\(.*\))?!?:\ .+$ ]]; then
           echo "❌ FAILURE: Invalid commit message: '$msg'"
           echo "   Rule: Use Conventional Commits (e.g., 'feat: add login' or 'fix(ui): button alignment')"
           exit 1
@@ -50,5 +68,109 @@ compliance_checks:
       done <<< "$COMMITS"
     - echo "✅ All commit messages follow Conventional Commits."
 
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+
+# ══════════════════════════════════════════════════════════════════════
+# STAGE 2: CODE QUALITY (ESLint + TypeScript + Prettier)
+# ══════════════════════════════════════════════════════════════════════
+
+install_dependencies:
+  stage: code-quality
+  image: node:20-alpine
+  script:
+    - npm ci --prefer-offline
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - node_modules/
+    policy: push
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+
+eslint:
+  stage: code-quality
+  image: node:20-alpine
+  needs: ["install_dependencies"]
+  <<: *node_cache
+  script:
+    - echo "🔍 Running ESLint..."
+    - npx eslint . --ext .ts,.tsx,.js,.jsx --format gitlab
+  artifacts:
+    reports:
+      codequality: gl-codequality.json
+    when: always
+  allow_failure: false
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+
+typescript:
+  stage: code-quality
+  image: node:20-alpine
+  needs: ["install_dependencies"]
+  <<: *node_cache
+  script:
+    - echo "🔍 Running TypeScript compiler checks..."
+    - npx tsc --noEmit --pretty
+    - echo "✅ No TypeScript errors found."
+  allow_failure: false
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+
+prettier:
+  stage: code-quality
+  image: node:20-alpine
+  needs: ["install_dependencies"]
+  <<: *node_cache
+  script:
+    - echo "🔍 Checking code formatting with Prettier..."
+    - npx prettier --check "src/**/*.{ts,tsx,js,jsx,json}" --ignore-path .gitignore
+    - echo "✅ All files are properly formatted."
+  allow_failure: false
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+
+# ══════════════════════════════════════════════════════════════════════
+# STAGE 3: STRUCTURAL REVIEW (Danger.js)
+# ══════════════════════════════════════════════════════════════════════
+
+danger_review:
+  stage: structural-review
+  image: node:20-alpine
+  needs: ["install_dependencies"]
+  <<: *node_cache
+  before_script:
+    - apk add --no-cache git
+  script:
+    - echo "🔍 Running Danger.js structural review..."
+    - npx danger ci --failOnErrors
+  allow_failure: false
+  variables:
+    # Danger needs a GitLab token to post comments
+    # Set DANGER_GITLAB_API_TOKEN in CI/CD Variables
+    DANGER_GITLAB_API_TOKEN: $GITLAB_TOKEN
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+
+# ══════════════════════════════════════════════════════════════════════
+# STAGE 4: AI CODE REVIEW (Claude API)
+# ══════════════════════════════════════════════════════════════════════
+
+ai_review:
+  stage: ai-review
+  image: node:20-alpine
+  needs: ["eslint", "typescript", "prettier", "danger_review"]
+  before_script:
+    - apk add --no-cache git
+  script:
+    - echo "🤖 Running AI code review with Claude..."
+    - node scripts/ai-review.mjs
+  variables:
+    # These must be set in GitLab > Settings > CI/CD > Variables (masked)
+    ANTHROPIC_API_KEY: $ANTHROPIC_API_KEY
+    GITLAB_TOKEN: $GITLAB_TOKEN
+  allow_failure: false  # Change to 'true' if you want AI review to be advisory-only
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
