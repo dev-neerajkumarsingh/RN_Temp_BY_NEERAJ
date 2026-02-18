@@ -18,7 +18,9 @@
  * 10. Optional chaining  – proper ?. usage, no excessive chaining, no misuse
  */
 
-import { danger, warn, fail, message, markdown } from 'danger';
+/* eslint-disable max-lines */
+// ↑ Dangerfile is a tooling config — 400-line limit applies to app code in src/
+import { danger, warn, fail, markdown } from 'danger';
 
 // ─── Helpers ──────────────────────────────────────────────────────────
 const modifiedFiles = danger.git.modified_files;

@@ -33,32 +33,32 @@ compliance_checks:
     - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
   script:
     - echo "🚀 Starting Compliance Checks for MR..."
-
-    # --- 1. BRANCH NAMING CONVENTION ---
-    - echo "🔍 Checking branch naming convention..."
     - |
+      bash <<'COMPLIANCE_SCRIPT'
+      set -e
+
+      # --- 1. BRANCH NAMING CONVENTION ---
+      echo "🔍 Checking branch naming convention..."
       if [[ ! "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME" =~ ^(feature/|bugFix/) ]]; then
         echo "❌ FAILURE: Invalid branch name: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME'"
         echo "   Rule: Branch names must start with 'feature/' or 'bugFix/'"
         exit 1
       fi
-    - echo "✅ Branch name follows guidelines."
+      echo "✅ Branch name follows guidelines."
 
-    # --- 2. MR SIZE LIMIT (50 FILES) ---
-    - echo "🔍 Checking MR size..."
-    - COUNTABLE_FILES=$(git diff --name-only origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME...$CI_COMMIT_SHA | grep -vE '\.(png|jpg|jpeg|gif|webp|svg|ttf|otf|woff|woff2)$' | wc -l)
-    - |
+      # --- 2. MR SIZE LIMIT (50 FILES) ---
+      echo "🔍 Checking MR size..."
+      COUNTABLE_FILES=$(git diff --name-only origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME...$CI_COMMIT_SHA | grep -vE '\.(png|jpg|jpeg|gif|webp|svg|ttf|otf|woff|woff2)$' | wc -l)
       if [ "$COUNTABLE_FILES" -gt 50 ]; then
         echo "❌ FAILURE: Merge Request too large ($COUNTABLE_FILES files)."
         echo "   Rule: Max 50 files (excluding assets/fonts). Please split your MR."
         exit 1
       fi
-    - echo "✅ MR size is within limits ($COUNTABLE_FILES files)."
+      echo "✅ MR size is within limits ($COUNTABLE_FILES files)."
 
-    # --- 3. CONVENTIONAL COMMITS ---
-    - echo "🔍 Checking commit message formats..."
-    - COMMITS=$(git log origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME..$CI_COMMIT_SHA --pretty=format:"%s")
-    - |
+      # --- 3. CONVENTIONAL COMMITS ---
+      echo "🔍 Checking commit message formats..."
+      COMMITS=$(git log origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME..$CI_COMMIT_SHA --pretty=format:"%s")
       while IFS= read -r msg; do
         if [[ ! "$msg" =~ ^(feat|fix|chore|docs|style|refactor|perf|test)(\(.*\))?!?:\ .+$ ]]; then
           echo "❌ FAILURE: Invalid commit message: '$msg'"
@@ -66,7 +66,11 @@ compliance_checks:
           exit 1
         fi
       done <<< "$COMMITS"
-    - echo "✅ All commit messages follow Conventional Commits."
+      echo "✅ All commit messages follow Conventional Commits."
+
+      echo ""
+      echo "🎉 All compliance checks passed!"
+      COMPLIANCE_SCRIPT
 
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
