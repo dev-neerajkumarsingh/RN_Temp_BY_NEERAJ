@@ -17,6 +17,8 @@ A professional, feature-rich, and production-ready boilerplate for React Native 
 - [Utilities](#utilities)
 - [Security](#security)
 - [Scripts](#scripts)
+- [Git Conventions](#git-conventions)
+- [CI/CD Pipeline](#cicd-pipeline)
 
 ---
 
@@ -1066,6 +1068,73 @@ const SVG_COMPONENTS: Record<IconTypes, React.FC<any>> = {
   your_icon: YourIconSvg,
 };
 ```
+
+---
+
+## Git Conventions
+
+### Branch Naming
+
+All branches must follow this naming convention — the CI pipeline will reject branches that don't match:
+
+| Prefix | When to Use | Example |
+|--------|-------------|---------|
+| `feature/` | New features, screens, or enhancements | `feature/add-profile-screen` |
+| `bugFix/` | Bug fixes | `bugFix/fix-login-crash` |
+
+### Commit Message Format
+
+This project enforces **Conventional Commits**. Every commit message must follow this pattern:
+
+```
+type(optional-scope): description
+```
+
+The pipeline will fail if any commit in your MR doesn't match this format.
+
+**Available types:**
+
+| Type | When to Use | Example |
+|------|-------------|---------|
+| `feat` | New feature or functionality that didn't exist before — a new screen, component, API endpoint, or user-facing capability | `feat: add forgot password screen` |
+| `fix` | A bug fix — something was broken and now it works | `fix: resolve crash on empty cart` |
+| `refactor` | Restructuring existing code without changing behavior — no new features, no bug fixes, just cleaner code | `refactor: extract API logic into custom hook` |
+| `style` | Visual/UI changes or code formatting (not logic changes) | `style: update login button colors to match theme` |
+| `chore` | Maintenance tasks that don't touch app logic — dependency updates, CI config, build scripts | `chore: upgrade react-native to 0.82` |
+| `docs` | Documentation only — README updates, inline comments, JSDoc | `docs: add setup instructions to README` |
+| `perf` | Performance improvements — the app does the same thing, but faster or using less memory | `perf: memoize FlatList renderItem` |
+| `test` | Adding or updating tests — no production code changes | `test: add unit tests for login screen` |
+
+**Scope** (optional): Describes which module/area is affected. Use parentheses after the type.
+
+Examples with scope: `feat(auth): implement biometric login`, `fix(navigation): back button not working on Android`, `refactor(redux): simplify auth slice`
+
+---
+
+## CI/CD Pipeline
+
+The project includes a 4-stage GitLab CI pipeline that runs automatically on every Merge Request. All stages must pass before merging is allowed.
+
+### Pipeline Stages
+
+| Stage | Job | What It Checks |
+|-------|-----|---------------|
+| 1. Compliance | `compliance_checks` | Branch naming convention, MR size limit (max 50 files), conventional commit messages |
+| 2. Code Quality | `eslint` | Linting rules via ESLint with `@react-native/eslint-config` |
+| | `typescript` | TypeScript strict mode compiler checks (`tsc --noEmit`) |
+| | `prettier` | Code formatting consistency |
+| 3. Structural Review | `danger_review` | Danger.js checks — folder structure, import discipline, optional chaining patterns, barrel exports, sensitive files, naming conventions, and more |
+| 4. AI Review | `ai_review` | Claude-powered code review against project guidelines (runs only if all previous stages pass) |
+
+### What Gets Checked
+
+**Compliance (Stage 1):** Branch must start with `feature/` or `bugFix/`. All commit messages must follow conventional commits. MR must not exceed 50 non-asset files.
+
+**Code Quality (Stage 2):** ESLint enforces no inline styles, no unused variables, and file size limits. TypeScript catches type errors. Prettier ensures consistent formatting.
+
+**Structural Review (Stage 3 — Danger.js):** MR description must be at least 20 characters. No new `.js` files (must use TypeScript). Screens, hooks, components, network, and redux files must be in correct directories. No direct `axios`, `fetch()`, or `AsyncStorage` imports — use `NetworkManager` and Redux Persist. No `console.log` in production code. Use path aliases (`@components`, `@hooks`, etc.) instead of deep relative imports. Use theme colors instead of hardcoded hex values. Update barrel `index.ts` files when adding new modules. No `.env` file changes in feature MRs. Optional chaining validation (excessive depth, unnecessary `?.` on non-nullable values, missing `?.` on API responses, contradictory `?.` with `!`).
+
+**AI Review (Stage 4):** Claude analyzes the full MR diff against project architecture and coding guidelines, posts detailed feedback with severity levels (BLOCKER, WARNING, SUGGESTION) directly on the MR.
 
 ---
 
