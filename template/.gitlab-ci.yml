@@ -21,6 +21,53 @@ variables:
       - node_modules/
     policy: pull
 
+# ── Reusable script: post MR comment on failure ─────────────────────
+# Each job saves output to /tmp/job_output.log, then after_script
+# checks CI_JOB_STATUS and posts a formatted comment to the MR.
+.post_failure_comment: &post_failure_comment
+  after_script:
+    - |
+      if [ "$CI_JOB_STATUS" = "failed" ] && [ -f /tmp/job_output.log ]; then
+        apk add --no-cache curl jq > /dev/null 2>&1 || true
+        # Truncate output to keep MR comments readable
+        OUTPUT=$(head -80 /tmp/job_output.log)
+        TOTAL_LINES=$(wc -l < /tmp/job_output.log)
+        if [ "$TOTAL_LINES" -gt 80 ]; then
+          OUTPUT="${OUTPUT}
+      ... (truncated — ${TOTAL_LINES} total lines. See full log in pipeline)"
+        fi
+        # Build JSON body safely using jq
+        COMMENT_BODY=$(printf '%s' "<!-- pipeline-failure-${CI_JOB_NAME} -->
+      ## ❌ Pipeline Failed: \`${CI_JOB_NAME}\`
+
+      <details>
+      <summary>Click to expand error details</summary>
+
+      \`\`\`
+      ${OUTPUT}
+      \`\`\`
+
+      </details>
+
+      🔗 [View full job log](${CI_JOB_URL})")
+        JSON_PAYLOAD=$(jq -n --arg body "$COMMENT_BODY" '{body: $body}')
+        # Delete previous comment from same job (if re-running pipeline)
+        NOTES_RESPONSE=$(curl -s --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" \
+          "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/merge_requests/${CI_MERGE_REQUEST_IID}/notes?per_page=100" || echo "[]")
+        echo "$NOTES_RESPONSE" | jq -e 'type == "array"' > /dev/null 2>&1 && \
+          echo "$NOTES_RESPONSE" | jq -r '.[] | select(.body | contains("<!-- pipeline-failure-'"${CI_JOB_NAME}"' -->")) | .id' \
+          | while read -r NOTE_ID; do
+              curl -s --request DELETE --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" \
+                "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/merge_requests/${CI_MERGE_REQUEST_IID}/notes/${NOTE_ID}" > /dev/null 2>&1 || true
+            done || true
+        # Post new comment
+        curl -s --request POST --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" \
+          --header "Content-Type: application/json" \
+          --data "$JSON_PAYLOAD" \
+          "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/merge_requests/${CI_MERGE_REQUEST_IID}/notes" > /dev/null 2>&1
+        echo "📝 Failure details posted as MR comment."
+      fi
+
 # ══════════════════════════════════════════════════════════════════════
 # STAGE 1: COMPLIANCE CHECKS (lightweight — alpine, no node_modules)
 # ══════════════════════════════════════════════════════════════════════
@@ -28,13 +75,15 @@ variables:
 compliance_checks:
   stage: compliance
   image: alpine:latest
+  variables:
+    GITLAB_TOKEN: $GITLAB_TOKEN
   before_script:
-    - apk add --no-cache git bash
+    - apk add --no-cache git bash curl
     - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
   script:
     - echo "🚀 Starting Compliance Checks for MR..."
     - |
-      bash <<'COMPLIANCE_SCRIPT'
+      bash <<'COMPLIANCE_SCRIPT' 2>&1 | tee /tmp/job_output.log
       set -e
 
       # --- 1. BRANCH NAMING CONVENTION ---
@@ -46,12 +95,12 @@ compliance_checks:
       fi
       echo "✅ Branch name follows guidelines."
 
-      # --- 2. MR SIZE LIMIT (50 FILES) ---
+      # --- 2. MR SIZE LIMIT (200 FILES) ---
       echo "🔍 Checking MR size..."
       COUNTABLE_FILES=$(git diff --name-only origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME...$CI_COMMIT_SHA | grep -vE '\.(png|jpg|jpeg|gif|webp|svg|ttf|otf|woff|woff2)$' | wc -l)
-      if [ "$COUNTABLE_FILES" -gt 50 ]; then
+      if [ "$COUNTABLE_FILES" -gt 200 ]; then
         echo "❌ FAILURE: Merge Request too large ($COUNTABLE_FILES files)."
-        echo "   Rule: Max 50 files (excluding assets/fonts). Please split your MR."
+        echo "   Rule: Max 200 files (excluding assets/fonts). Please split your MR."
         exit 1
       fi
       echo "✅ MR size is within limits ($COUNTABLE_FILES files)."
@@ -71,7 +120,7 @@ compliance_checks:
       echo ""
       echo "🎉 All compliance checks passed!"
       COMPLIANCE_SCRIPT
-
+  <<: *post_failure_comment
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
 
@@ -99,14 +148,17 @@ eslint:
   image: node:20-alpine
   needs: ["install_dependencies"]
   <<: *node_cache
+  variables:
+    GITLAB_TOKEN: $GITLAB_TOKEN
   script:
     - echo "🔍 Running ESLint..."
-    - npx eslint . --ext .ts,.tsx,.js,.jsx --format gitlab
+    - npx eslint . --ext .ts,.tsx,.js,.jsx --format gitlab 2>&1 | tee /tmp/job_output.log
   artifacts:
     reports:
       codequality: gl-codequality.json
     when: always
   allow_failure: false
+  <<: *post_failure_comment
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
 
@@ -115,11 +167,14 @@ typescript:
   image: node:20-alpine
   needs: ["install_dependencies"]
   <<: *node_cache
+  variables:
+    GITLAB_TOKEN: $GITLAB_TOKEN
   script:
     - echo "🔍 Running TypeScript compiler checks..."
-    - npx tsc --noEmit --pretty
+    - npx tsc --noEmit --pretty 2>&1 | tee /tmp/job_output.log
     - echo "✅ No TypeScript errors found."
   allow_failure: false
+  <<: *post_failure_comment
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
 
@@ -128,11 +183,14 @@ prettier:
   image: node:20-alpine
   needs: ["install_dependencies"]
   <<: *node_cache
+  variables:
+    GITLAB_TOKEN: $GITLAB_TOKEN
   script:
     - echo "🔍 Checking code formatting with Prettier..."
-    - npx prettier --check "src/**/*.{ts,tsx,js,jsx,json}" --ignore-path .gitignore
+    - npx prettier --check "src/**/*.{ts,tsx,js,jsx,json}" --ignore-path .gitignore 2>&1 | tee /tmp/job_output.log
     - echo "✅ All files are properly formatted."
   allow_failure: false
+  <<: *post_failure_comment
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
 

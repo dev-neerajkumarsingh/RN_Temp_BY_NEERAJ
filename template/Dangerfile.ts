@@ -19,7 +19,6 @@
  */
 
 /* eslint-disable max-lines */
-// ↑ Dangerfile is a tooling config — 400-line limit applies to app code in src/
 import { danger, warn, fail, markdown } from 'danger';
 
 // ─── Helpers ──────────────────────────────────────────────────────────
