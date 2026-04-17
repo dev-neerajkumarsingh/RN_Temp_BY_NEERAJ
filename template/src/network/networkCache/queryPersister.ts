@@ -18,7 +18,7 @@ const asyncStorageAdapter = {
   },
   removeItem: async (key: string): Promise<void> => {
     const storage = await initSecureStorage();
-    storage.delete(key);
+    storage.remove(key);
   },
 };
 
