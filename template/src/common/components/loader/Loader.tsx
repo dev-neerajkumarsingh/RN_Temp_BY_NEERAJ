@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { View, ActivityIndicator, StyleSheet, ColorValue } from 'react-native';
 import { useTheme, GlobalStyles } from '@themes';
-import { useSelector } from 'react-redux';
-import type { RootState } from '@redux';
+import { useUIStore } from '@stores';
 import { useLoaderStyles } from './Styles';
 
 type LoaderVariant = 'primary' | 'secondary';
@@ -66,11 +65,11 @@ const BaseLoaderComponent: React.FC<BaseLoaderProps> = ({
 export const BaseLoader = React.memo(BaseLoaderComponent);
 
 /**
- * Loader - Redux-connected global loader
- * Automatically shows/hides based on Redux loader state
+ * Loader - Global loader connected to the UI store.
+ * Automatically shows/hides based on loader state.
  */
 export const Loader: React.FC = (): React.ReactElement | null => {
-  const loaderState = useSelector((state: RootState) => state.loader.status);
+  const loaderState = useUIStore((state) => state.loader.status);
 
   return <BaseLoader visible={loaderState} variant="primary" />;
 };

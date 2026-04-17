@@ -4,15 +4,13 @@ import { useOnboardStyles } from './Styles';
 import { useNavs } from '@hooks';
 import { useTheme, GlobalStyles } from '@themes';
 import { View, Modal } from 'react-native';
-import { showToast } from '@redux';
-import { useDispatch } from 'react-redux';
+import { showToast } from '@stores';
 
 export const Onboard = () => {
   const { theme } = useTheme();
   const globalStyles = GlobalStyles(theme);
   const styles = useOnboardStyles();
   const [open, setOpen] = React.useState(false);
-  const dispatch = useDispatch();
 
   return (
     <CommonBox moreStyles={globalStyles.centerContent}>
@@ -56,14 +54,12 @@ export const Onboard = () => {
               label="Open Toaster"
               fontSize={16}
               onPress={() =>
-                dispatch(
-                  showToast({
-                    title: 'Hello',
-                    message: 'World',
-                    type: 'error',
-                    duration: 3000,
-                  }),
-                )
+                showToast({
+                  title: 'Hello',
+                  message: 'World',
+                  type: 'error',
+                  duration: 3000,
+                })
               }
               moreButtonStyle={styles.button}
             />

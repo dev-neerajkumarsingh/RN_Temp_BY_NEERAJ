@@ -1,8 +1,7 @@
 import React from 'react';
 import {View} from 'react-native';
-import {useSelector, useDispatch} from 'react-redux';
 import {CommonBox, CommonText, CommonButton, CommonImage} from '@components';
-import {RootState, hideErrorScreen} from '@redux';
+import {useUIStore, hideErrorScreen} from '@stores';
 import {useErrorScreenStyles} from './Styles';
 import {onlineManager} from '@tanstack/react-query';
 
@@ -11,10 +10,9 @@ import {useTheme} from '@themes';
 
 export const CommonErrorScreen = () => {
   const [states, setStates] = React.useState({status: false});
-  const {status, buttonLabel, title, message, networkConfig} = useSelector(
-    (store: RootState) => store.errorScreen,
+  const {status, buttonLabel, title, message, networkConfig} = useUIStore(
+    (state) => state.errorScreen,
   );
-  const dispatch = useDispatch();
   const styles = useErrorScreenStyles();
   const {theme} = useTheme();
 
@@ -28,7 +26,7 @@ export const CommonErrorScreen = () => {
   };
 
   const onPressClose = () => {
-    dispatch(hideErrorScreen());
+    hideErrorScreen();
   };
 
   React.useEffect(() => {

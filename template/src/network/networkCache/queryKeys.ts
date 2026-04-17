@@ -1,21 +1,29 @@
+/**
+ * Centralized query-key factory.
+ *
+ * Use `as const` tuples so invalidation works with structural prefixes:
+ *
+ *   queryClient.invalidateQueries({ queryKey: queryKeys.authenticated.all });
+ *     → invalidates every authenticated query
+ *
+ *   queryClient.invalidateQueries({ queryKey: queryKeys.authenticated.profile() });
+ *     → invalidates only the profile query
+ */
+
 export const queryKeys = {
-  // For Non-Authenticated APIs Flow related
   nonAuthenticated: {
     all: ['auth'] as const,
-    privacypolicy: (): string[] => [...queryKeys.nonAuthenticated.all, 'privacypolicy'] as const,
-    termscondition: (): string[] => [...queryKeys.nonAuthenticated.all, 'termscondition'] as const,
-    login: (): string[] => [...queryKeys.nonAuthenticated.all, 'login'] as const,
-    signup: (): string[] => [...queryKeys.nonAuthenticated.all, 'signup'] as const,
-    sendotp: (): string[] => [...queryKeys.nonAuthenticated.all, 'sendotp'] as const,
-    forgotpassword: (): string[] => [...queryKeys.nonAuthenticated.all, 'forgotpassword'] as const,
-    // Rest of your keys here...
+    privacypolicy: () => [...queryKeys.nonAuthenticated.all, 'privacypolicy'] as const,
+    termscondition: () => [...queryKeys.nonAuthenticated.all, 'termscondition'] as const,
+    login: () => [...queryKeys.nonAuthenticated.all, 'login'] as const,
+    signup: () => [...queryKeys.nonAuthenticated.all, 'signup'] as const,
+    sendotp: () => [...queryKeys.nonAuthenticated.all, 'sendotp'] as const,
+    forgotpassword: () => [...queryKeys.nonAuthenticated.all, 'forgotpassword'] as const,
   },
-  // For Authenticated APIs Flow related
   authenticated: {
     all: ['app'] as const,
-    profile: (): string[] => [...queryKeys.authenticated.all, 'profile'] as const,
-    logout: (): string[] => [...queryKeys.authenticated.all, 'logout'] as const,
-    updatetoken: (): string[] => [...queryKeys.authenticated.all, 'updatetoken'] as const,
-    // Rest of yours keys here...
+    profile: () => [...queryKeys.authenticated.all, 'profile'] as const,
+    logout: () => [...queryKeys.authenticated.all, 'logout'] as const,
+    updatetoken: () => [...queryKeys.authenticated.all, 'updatetoken'] as const,
   },
 } as const;

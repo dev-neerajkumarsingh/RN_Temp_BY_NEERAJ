@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { View } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState, hidePopup } from '@redux';
+import { useUIStore, hidePopup } from '@stores';
 import { CommonText, CommonButton } from '@components';
 import { useNavigation, StackActions } from '@react-navigation/native';
 import { useTheme } from '@themes';
@@ -9,10 +8,9 @@ import { useStyles } from './Styles';
 
 export const CommonPopup = () => {
   const [states, setStates] = React.useState({ modalStatus: false });
-  const { status, title, buttonLabel, onPressType } = useSelector(
-    (store: RootState) => store.popup,
+  const { status, title, buttonLabel, onPressType } = useUIStore(
+    (state) => state.popup,
   );
-  const dispatch = useDispatch();
   const navigation = useNavigation();
   const styles = useStyles();
   const { theme } = useTheme();
@@ -23,7 +21,7 @@ export const CommonPopup = () => {
 
   const onPressClose = () => {
     setStates(prev => ({ ...prev, modalStatus: false }));
-    dispatch(hidePopup());
+    hidePopup();
     if (onPressType === 'goback') {
       navigation.goBack();
     }

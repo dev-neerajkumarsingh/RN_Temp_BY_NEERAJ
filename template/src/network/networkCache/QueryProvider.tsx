@@ -1,9 +1,13 @@
 import React from 'react';
-import { QueryClientProvider } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { queryClient } from './queryClient';
+import { queryPersister } from './queryPersister';
 
-// Optional: For debugging in development
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+// Note on devtools: `@tanstack/react-query-devtools` renders via the DOM and
+// doesn't work in React Native. If you want a query inspector on-device, swap
+// in `react-query-native-devtools` or the Reactotron plugin. The devtools
+// dep in package.json is intentionally present so web/Storybook consumers
+// can import it; it is not rendered here.
 
 interface QueryProviderProps {
   children: React.ReactNode;
@@ -11,10 +15,17 @@ interface QueryProviderProps {
 
 export const QueryProvider: React.FC<QueryProviderProps> = ({ children }) => {
   return (
-    <QueryClientProvider client={queryClient}>
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{
+        persister: queryPersister,
+        // Bump `buster` whenever your cached query shapes change across
+        // releases — it nukes the persisted cache so stale shapes don't
+        // resurrect after an app update.
+        buster: 'v1',
+        maxAge: 24 * 60 * 60 * 1000,
+      }}>
       {children}
-      {/* Uncomment for dev tools in development */}
-      {/* {__DEV__ && <ReactQueryDevtools initialIsOpen={false} />} */}
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
   );
 };
