@@ -2,7 +2,8 @@
 
 A professional, feature-rich, and production-ready boilerplate for React Native applications. Built with TypeScript, this template provides a solid foundation with best practices, optimized performance, and a comprehensive set of reusable components.
 
-[![React Native](https://img.shields.io/badge/React%20Native-0.81.5-blue.svg)](https://reactnative.dev/)
+[![React Native](https://img.shields.io/badge/React%20Native-0.84.0-blue.svg)](https://reactnative.dev/)
+[![React](https://img.shields.io/badge/React-19.2.3-blue.svg)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue.svg)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
@@ -10,28 +11,28 @@ A professional, feature-rich, and production-ready boilerplate for React Native 
 
 ### Prerequisites
 
-- Node.js >= 20.x
-- npm or yarn
+- Node.js >= 22.11
+- pnpm (used by `deep-clean`) or npm
 - Xcode (for iOS)
 - Android Studio (for Android)
 
 ### Installation
 
 ```bash
-# Clone the repository
-npx @react-native-community/cli init <YOUR-APP-NAME> --template "https://github.com/dev-neerajkumarsingh/RN_Temp_BY_NEERAJ.git"
+# Initialize a new project from this template
+npx @react-native-community/cli init <YOUR-APP-NAME> \
+  --template "https://github.com/dev-neerajkumarsingh/RN_Temp_BY_NEERAJ.git"
 
-# Navigate to your project directory
-cd <project-directory>/<YOUR-APP-NAME>
+cd <YOUR-APP-NAME>
 
-# Install dependencies
+# Install dependencies (also reinstalls pods on iOS via the deep-clean script)
 npm run deep-clean
 ```
 
 ### Running the App
 
 ```bash
-# Start Metro bundler
+# Start Metro bundler (resets cache + watchman)
 npm start
 
 # Run on Android
@@ -39,6 +40,12 @@ npm run android
 
 # Run on iOS
 npm run ios
+```
+
+### Renaming the App
+
+```bash
+npm run rename -- "Your New App Name"
 ```
 
 ---
@@ -58,7 +65,10 @@ npm run ios
 - [Hooks](#hooks)
 - [Utilities](#utilities)
 - [Security](#security)
+- [Path Aliases](#path-aliases)
 - [Scripts](#scripts)
+- [Git Conventions](#git-conventions)
+- [CI/CD Pipeline](#cicd-pipeline)
 
 ---
 
@@ -66,41 +76,48 @@ npm run ios
 
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| React Native | 0.81.5 | Mobile framework |
-| React | 19.1.0 | UI library |
+| React Native | 0.84.0 | Mobile framework |
+| React | 19.2.3 | UI library |
 | TypeScript | Strict mode | Type safety |
-| Redux Toolkit | Latest | Global state management |
-| Redux Persist | Latest | State persistence |
-| TanStack Query | Latest | Server state & caching |
-| React Navigation 7 | Latest | Navigation |
-| Axios | Latest | HTTP client |
-| React Native Reanimated | Latest | Animations |
-| React Native Keychain | Latest | Secure storage |
+| Redux Toolkit | ^2.10 | Persistent domain state (auth, lang, theme) |
+| Redux Persist | ^6.0 | State persistence |
+| Zustand | ^5.0 | Ephemeral UI state (loader, toast, popup, error screen) |
+| TanStack Query | ^5.90 | Server state, caching, persistence |
+| TanStack Query Persist Client | ^5.90 | Cache rehydration across app launches |
+| React Navigation | ^7.1 | Navigation |
+| Axios | ^1.11 | HTTP client |
+| React Native Reanimated | ^4.1 | Animations |
+| React Native MMKV | ^4.3 | Encrypted key/value storage |
+| React Native Keychain | ^10.0 | Hardware-backed master key vault |
+| React Native Quick Crypto | ^1.0 | AES-256-CBC encryption |
+| React Native Keyboard Controller | ^1.19 | Keyboard handling |
+| React Native NetInfo | ^11.4 | Online/offline awareness |
 
 ---
 
 ## Features
 
 ### Core Features
-- **TypeScript** - Full type safety with strict mode enabled
-- **State Management** - Redux Toolkit with encrypted persistence
-- **Server State** - TanStack Query for caching, background refetch, and synchronization
-- **Secure Storage** - Hardware-backed keychain storage for sensitive data
-- **End-to-End Encryption** - AES-256-CBC encryption for API communication
-- **Theme Support** - Light/dark themes with system preference detection
-- **Responsive Design** - Percentage and aspect-ratio based sizing utilities
+- **TypeScript** — Full type safety with strict mode enabled
+- **Hybrid State Model** — Redux Toolkit for persistent domain state, Zustand for ephemeral UI state
+- **Server State** — TanStack Query with offline-first defaults, persisted cache, and NetInfo-driven online manager
+- **Encrypted Storage** — MMKV instance encrypted with a 256-bit master key kept in the OS Keychain
+- **End-to-End Encryption** — AES-256-CBC encryption for API request and response bodies (handled in axios interceptors)
+- **Theme Support** — Light/dark themes with `'system'` mode that follows OS preference
+- **Responsive Design** — Percentage and aspect-ratio based sizing utilities
 
 ### UI Components
 - Pre-built, memoized, and reusable components
 - Full SVG support with dynamic colors
-- Keyboard-aware views and inputs
-- Modal system (popups, bottom sheets, image viewer)
+- Keyboard-aware views and inputs (via `react-native-keyboard-controller`)
+- Modal system (popups, bottom sheets, image viewer, web view)
 - Toast notifications with multiple variants
-- Loading indicators (global and local)
+- Loading indicators (global and local) sharing a `BaseLoader`
 
 ### Developer Experience
-- Path aliases for clean imports (`@components`, `@hooks`, etc.)
+- Path aliases for clean imports (`@components`, `@hooks`, `@stores`, etc.)
 - ESLint and Prettier pre-configured
+- Husky + lint-staged on commit
 - Jest setup for testing
 - Comprehensive TypeScript types
 
@@ -111,58 +128,63 @@ npm run ios
 ```
 src/
 ├── assets/                    # Static assets
-│   ├── fonts/                 # Custom fonts (Inter family)
+│   ├── fonts/                 # Custom fonts (Inter / Clash families)
 │   └── icons/                 # SVG icon library
 │
 ├── common/                    # Shared code
 │   ├── components/            # Reusable UI components
-│   │   ├── animation-samples/ # Animation examples
+│   │   ├── animation-samples/
 │   │   ├── common-bottom-sheet/
 │   │   ├── common-button/
 │   │   ├── common-drop-down/
 │   │   ├── common-image/
-│   │   ├── common-input/
-│   │   ├── common-modals/
+│   │   ├── common-input/      # CommonInput, CommonOtpInput
+│   │   ├── common-line/
+│   │   ├── common-modals/     # error screen, image viewer, web view, image picker
 │   │   ├── common-popup/
 │   │   ├── common-text/
 │   │   ├── common-toast/
 │   │   ├── common-top-tabs/
-│   │   ├── common-wrapper/
-│   │   └── loader/
-│   ├── constants/             # App constants and URLs
+│   │   ├── common-wrapper/    # CommonBox, KeyboardAvoidingView, KeyboardStickyView
+│   │   └── loader/            # BaseLoader, Loader (global), Shimmer (local)
+│   ├── constants/             # App constants, URLs, language list
 │   └── hooks/                 # Custom React hooks
 │
 ├── network/                   # API layer
-│   ├── apis/                  # Endpoints and services
-│   │   ├── endpoints/         # API endpoint definitions
-│   │   └── services/          # API service functions
-│   ├── middleware/            # Network manager
-│   └── networkCache/          # React Query configuration
+│   ├── apis/
+│   │   ├── endpoints/         # Endpoint descriptors
+│   │   └── services/          # Service functions + TanStack Query hooks
+│   ├── client/                # Axios instance + request/response interceptors
+│   ├── middleware/            # NetworkManager + HTTP method enum
+│   └── networkCache/          # QueryClient, QueryProvider, persister, query keys
 │
-├── redux/                     # State management
-│   ├── encryption/            # Keychain storage adapter
-│   ├── reducers/              # Redux slices
+├── redux/                     # Persistent domain state
+│   ├── reducers/              # auth, lang, theme slices
 │   ├── reduxHooks/            # Typed hooks
-│   └── store/                 # Store configuration
+│   └── store/                 # Store + redux-persist configuration
+│
+├── stores/                    # Ephemeral UI state (Zustand)
+│   └── uiStore.ts             # loader, toast, popup, errorScreen
 │
 ├── routes/                    # Navigation
-│   ├── initialNavigator/      # App entry point
-│   └── rootNavigator/         # Stack navigators
+│   ├── initialNavigator/      # App entry: Providers + global overlays
+│   └── rootNavigator/         # Stack navigators (splash, auth, app, example)
 │
 ├── screens/                   # Screen components
-│   ├── app/                   # Authenticated screens
-│   ├── auth/                  # Authentication screens
+│   ├── app/                   # Authenticated screens (home, profile)
+│   ├── auth/                  # Auth screens (onboard, login, signup, otp, forgotPassword)
 │   └── splash/                # Splash screen
 │
 ├── themes/                    # Theming
 │   ├── globalStyles/          # Global style utilities
-│   ├── list/                  # Theme definitions
-│   └── themeContext/          # Theme provider
+│   ├── list/                  # Light & dark theme definitions
+│   └── themeContext/          # ThemeProvider + useTheme hook
 │
 └── utils/                     # Utilities
     ├── pixelate/              # Screen dimension utilities
     ├── responsiveUtils/       # Responsive sizing
-    └── utils-func/            # Helper functions
+    ├── storage/               # MMKVStorageAdapter, SecureStorage (Keychain master key)
+    └── utils-func/            # Helper functions, encryption
 ```
 
 ---
@@ -198,7 +220,7 @@ import { CommonButton } from '@components';
 <CommonButton
   contentType="localSvg"
   svgType="arrowleft"
-  svgColor="#fff"
+  svgColor="primary"
   imgWidth={24}
   imgHeight={24}
   onPress={handleBack}
@@ -244,7 +266,7 @@ import { CommonText } from '@components';
   content="Hello World"
   fontSize={16}
   fontType="InterBold"
-  color="#333"
+  color="text1"
   textAlign="center"
 />
 ```
@@ -262,7 +284,7 @@ import { CommonImage } from '@components';
   svgSource="arrowleft"
   width={24}
   height={24}
-  color="#000"
+  color="text1"
 />
 
 // Remote image
@@ -348,7 +370,6 @@ import { CommonTopTabs } from '@components';
 ```tsx
 import { showToast } from '@stores';
 
-// Show success toast
 showToast({
   type: 'success',
   title: 'Success!',
@@ -364,11 +385,10 @@ showToast({
 ```tsx
 import { useNavs } from '@hooks';
 
-const { navigate, goback, reset, push, replace, pop } = useNavs();
-
-navigate('Home', { userId: 123 });
-goback();
-reset('Login');
+useNavs.navigate('Home', { userId: 123 });
+useNavs.goback();
+useNavs.replace('Login');
+useNavs.reset({ index: 0, routes: [{ name: 'AppStack' }] });
 ```
 
 ### Form Validation
@@ -377,10 +397,10 @@ reset('Login');
 import { useValidators } from '@hooks';
 
 const emailResult = useValidators.email('test@example.com');
-// { status: true, msg: '' } or { status: false, msg: 'Email ID is not valid' }
+// { status: true, msg: '' } | { status: false, msg: 'Email ID is not valid' }
 
-const passwordResult = useValidators.password('Test@123');
-// Requires: min 8 chars, 1 uppercase, 1 number, 1 special char
+const passwordResult = useValidators.password('Test@1234');
+// Requires: ≥ 8 chars, 1 uppercase, 1 number, 1 special character
 ```
 
 ### Theming
@@ -388,7 +408,7 @@ const passwordResult = useValidators.password('Test@123');
 ```tsx
 import { useTheme } from '@themes';
 
-const { theme, currentThemeName, setTheme } = useTheme();
+const { theme, themeMode, isDark, setThemeMode, toggleTheme } = useTheme();
 
 <View style={{ backgroundColor: theme.colors.primary }}>
   <Text style={{ color: theme.colors.text1 }}>Themed Text</Text>
@@ -399,10 +419,19 @@ const { theme, currentThemeName, setTheme } = useTheme();
 
 ```tsx
 import { useLoginMutation } from '@network';
+import { loginReducer, useAppDispatch } from '@redux';
 
+const dispatch = useAppDispatch();
 const loginMutation = useLoginMutation({
-  onSuccess: (data) => dispatch(loginReducer(data)),
-  onError: (error) => console.error(error),
+  onSuccess: (res) => {
+    if (res.success) {
+      dispatch(loginReducer({
+        userData: res.data,
+        accessToken: res.data.accessToken,
+        refreshToken: res.data.refreshToken,
+      }));
+    }
+  },
 });
 
 loginMutation.mutate({ email, password });
@@ -412,7 +441,7 @@ loginMutation.mutate({ email, password });
 
 ## Components
 
-All components are optimized with `React.memo` and use `useMemo`/`useCallback` for performance.
+All components are wrapped in `React.memo` and use `useMemo` / `useCallback` for performance.
 
 ### CommonButton
 
@@ -433,7 +462,7 @@ import { CommonButton } from '@components';
 <CommonButton
   contentType="localSvg"
   svgType="arrowleft"
-  svgColor="#fff"
+  svgColor="primary"
   imgWidth={24}
   imgHeight={24}
   onPress={handleBack}
@@ -449,27 +478,28 @@ import { CommonButton } from '@components';
 ```
 
 **Props:**
+
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `width` | `string \| number` | `'100%'` | Button width |
-| `height` | `string \| number` | `responsiveHeight(6)` | Button height |
+| `width` | `DimensionValue` | `'100%'` | Button width |
+| `height` | `DimensionValue` | `responsiveHeight(6)` | Button height |
 | `contentType` | `'text' \| 'localSvg' \| 'localNonSvg' \| 'uri'` | `'text'` | Content type |
-| `label` | `string` | - | Button text |
-| `textColor` | `string` | `'#fff'` | Text color |
+| `label` | `string` | – | Button text |
+| `textColor` | `ColorKey \| string` | theme primary | Text color (theme key or raw value) |
 | `fontSize` | `number` | `14` | Font size |
 | `fontType` | `FontTypes` | `'Clash_MEDIUM'` | Font family |
-| `svgType` | `IconTypes` | - | SVG icon name |
-| `svgColor` | `string` | - | SVG color |
+| `svgType` | `IconTypes` | – | SVG icon name |
+| `svgColor` | `ColorKey \| string` | – | SVG color |
 | `disabled` | `boolean` | `false` | Disabled state |
 | `loader` | `boolean` | `false` | Show loading indicator |
-| `onPress` | `() => void` | - | Press handler |
-| `onLongPress` | `() => void` | - | Long press handler |
+| `onPress` | `() => void` | – | Press handler |
+| `onLongPress` | `() => void` | – | Long press handler |
 
 ---
 
 ### CommonInput
 
-A feature-rich text input with validation, icons, and error display.
+A feature-rich text input with floating label support, icons, and error display.
 
 ```tsx
 import { CommonInput } from '@components';
@@ -494,24 +524,24 @@ import { CommonInput } from '@components';
 />
 ```
 
-**Props:**
+**Props (selected):**
+
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `value` | `string` | **required** | Input value |
 | `onChangeText` | `(text: string) => void` | **required** | Change handler |
-| `placeholder` | `string` | - | Placeholder text |
+| `placeholder` | `string` | – | Placeholder text |
 | `keyboardType` | `'default' \| 'numeric' \| 'email-address' \| 'phone-pad'` | `'default'` | Keyboard type |
 | `secureTextEntry` | `boolean` | `false` | Password mode |
-| `leftIcon` | `IconTypes` | - | Left icon |
-| `rightIcon` | `IconTypes` | - | Right icon |
-| `onPressRightIcon` | `(icon: string) => void` | - | Right icon press handler |
-| `msgError` | `string` | - | Error message |
+| `leftIcon` / `rightIcon` | `IconTypes` | – | Icon names |
+| `onPressRightIcon` | `(text: string) => void` | – | Right icon press handler |
+| `msgError` | `string` | – | Error message |
 | `disableError` | `boolean` | `false` | Hide error display |
-| `editable` | `boolean` | `true` | Editable state |
+| `enableFloatingLabel` | `boolean` | `false` | X-style animated label |
+| `focusedBorderColor` | `ColorKey \| string` | – | Border color when focused |
 | `multiline` | `boolean` | `false` | Multiline mode |
-| `maxLength` | `number` | - | Max character length |
-| `renderLeftIcon` | `() => ReactNode` | - | Custom left icon renderer |
-| `renderRightIcon` | `() => ReactNode` | - | Custom right icon renderer |
+| `maxLength` | `number` | `100` | Max character length |
+| `renderLeftIcon` / `renderRightIcon` | `() => ReactNode` | – | Custom renderers |
 
 ---
 
@@ -526,11 +556,10 @@ import { CommonText } from '@components';
   content="Hello World"
   fontSize={16}
   fontType="InterBold"
-  color="#333"
+  color="text1"
   textAlign="center"
 />
 
-// With number of lines
 <CommonText
   content={longText}
   numberOfLines={2}
@@ -539,16 +568,17 @@ import { CommonText } from '@components';
 ```
 
 **Props:**
+
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `content` | `string` | **required** | Text content |
-| `color` | `string` | `'black'` | Text color |
+| `color` | `ColorKey \| string` | `'black'` | Text color (theme key or raw value) |
 | `fontSize` | `number` | `14` | Font size |
 | `lineHeight` | `number` | `fontSize + 5` | Line height |
 | `fontType` | `FontTypes` | `'Inter_18ptBold'` | Font family |
 | `textAlign` | `'left' \| 'center' \| 'right' \| 'justify'` | `'left'` | Text alignment |
-| `numberOfLines` | `number` | - | Max lines |
-| `ellipsizeMode` | `'head' \| 'middle' \| 'tail' \| 'clip'` | - | Truncation mode |
+| `numberOfLines` | `number` | – | Max lines |
+| `ellipsizeMode` | `'head' \| 'middle' \| 'tail' \| 'clip'` | – | Truncation mode |
 
 ---
 
@@ -565,7 +595,7 @@ import { CommonImage } from '@components';
   svgSource="arrowleft"
   width={24}
   height={24}
-  color="#000"
+  color="text1"
 />
 
 // Remote image with fade-in
@@ -587,14 +617,15 @@ import { CommonImage } from '@components';
 ```
 
 **Props:**
+
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `sourceType` | `'url' \| 'localNonSvg' \| 'localSvg'` | **required** | Image source type |
-| `source` | `string \| number` | - | Image source (URL or require) |
-| `svgSource` | `IconTypes` | - | SVG icon name |
-| `width` | `string \| number` | **required** | Image width |
-| `height` | `string \| number` | **required** | Image height |
-| `color` | `string` | `'#000'` | SVG color |
+| `source` | `string \| number` | – | Image source (URL or `require(...)`) |
+| `svgSource` | `IconTypes` | – | SVG icon name |
+| `width` | `DimensionValue` | **required** | Image width |
+| `height` | `DimensionValue` | **required** | Image height |
+| `color` | `ColorKey \| string` | `'#000'` | SVG color |
 | `resizeMode` | `'cover' \| 'contain' \| 'stretch' \| 'center'` | `'contain'` | Resize mode |
 | `duration` | `number` | `500` | Fade-in animation duration (ms) |
 
@@ -602,7 +633,7 @@ import { CommonImage } from '@components';
 
 ### CommonBox
 
-Main container wrapper with StatusBar, scroll, and keyboard handling.
+Main screen container with StatusBar, scroll, and keyboard handling.
 
 ```tsx
 import { CommonBox } from '@components';
@@ -628,6 +659,7 @@ import { CommonBox } from '@components';
 ```
 
 **Props:**
+
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `children` | `ReactNode` | **required** | Child components |
@@ -650,24 +682,21 @@ import { CommonBottomSheet } from '@components';
 <CommonBottomSheet
   isVisible={showSheet}
   onClose={() => setShowSheet(false)}
-  isScrollable={true}
+  isScrollable
 >
-  {() => (
-    <View>
-      <Text>Sheet Content</Text>
-    </View>
-  )}
+  {() => <View><Text>Sheet Content</Text></View>}
 </CommonBottomSheet>
 ```
 
 **Props:**
+
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `isVisible` | `boolean` | **required** | Visibility state |
 | `onClose` | `() => void` | **required** | Close handler |
-| `children` | `() => ReactNode` | - | Content render function |
+| `children` | `() => ReactNode` | – | Content render function |
 | `isScrollable` | `boolean` | `false` | Enable scroll |
-| `containerStyle` | `StyleProp<ViewStyle>` | - | Custom container style |
+| `containerStyle` | `StyleProp<ViewStyle>` | – | Custom container style |
 
 ---
 
@@ -707,13 +736,12 @@ import { CommonTopTabs } from '@components';
 
 ### CommonToaster
 
-Redux-connected toast notification system with type-based styling.
+Global toast notification system, driven by the Zustand UI store.
 
 ```tsx
-import { useDispatch } from 'react-redux';
 import { showToast } from '@stores';
 
-// Show success toast
+// Anywhere — no hook required
 showToast({
   type: 'success',
   title: 'Success!',
@@ -721,7 +749,6 @@ showToast({
   duration: 3000,
 });
 
-// Show error toast
 showToast({
   type: 'error',
   title: 'Error',
@@ -732,33 +759,50 @@ showToast({
 // Toast types: 'success' | 'error' | 'info' | 'warn'
 ```
 
+`<CommonToaster />` is mounted once in `InitialNavigator` and reads state from `useUIStore`.
+
 ---
 
-### Loader & Shimmer
+### CommonPopup & CommonErrorScreen
 
-Loading indicators for global and local use. Refactored to share a common `BaseLoader` component for reusability.
+Both are mounted globally in `InitialNavigator` and driven by the Zustand UI store.
 
 ```tsx
-import { Loader, Shimmer, BaseLoader } from '@components';
-import { showLoader, hideLoader } from '@redux';
+import { showPopup, showErrorScreen } from '@stores';
 
-// Global loader (Redux-connected)
-// Controlled via Redux actions
-dispatch(showLoader());
-dispatch(hideLoader());
+showPopup({
+  title: 'Are you sure?',
+  buttonLabel: 'Yes',
+  onPressType: 'logout',
+});
 
-// The Loader component is automatically rendered in the app
+showErrorScreen({
+  title: 'Oops!',
+  message: 'No internet connection.',
+  buttonLabel: 'Try again',
+  networkConfig: error.config ?? null,
+});
+```
+
+The error screen also auto-shows on offline detection (axios response interceptor).
+
+---
+
+### Loader, Shimmer & BaseLoader
+
+Loading indicators sharing a single `BaseLoader` implementation.
+
+```tsx
+import { Shimmer, Loader } from '@components';
+import { showLoader, hideLoader } from '@stores';
+
+// Global loader — driven by the Zustand UI store
+showLoader();
+hideLoader();
+// <Loader /> is mounted once in InitialNavigator
 
 // Local shimmer
 <Shimmer loaderStatus={isLoading} />
-
-// Custom loader with BaseLoader
-<BaseLoader
-  visible={isLoading}
-  variant="secondary"  // 'primary' | 'secondary'
-  size="small"         // 'small' | 'large'
-  color="#custom"      // Optional custom color
-/>
 ```
 
 ---
@@ -785,7 +829,7 @@ const [isValid, setIsValid] = useState(false);
 
 ### CommonImagePickerModal
 
-Image picker with camera and gallery support, permissions handling, and cropping.
+Image picker with camera and gallery support, permissions handling, and cropping (uses `react-native-image-crop-picker`).
 
 ```tsx
 import { CommonImagePickerModal } from '@components';
@@ -804,20 +848,32 @@ import { CommonImagePickerModal } from '@components';
 ```
 
 **Props:**
+
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `isVisible` | `boolean` | **required** | Visibility state |
 | `onPressClose` | `() => void` | **required** | Close handler |
 | `onSelectImage` | `(image) => void` | **required** | Image selection handler |
-| `onError` | `(error) => void` | - | Error handler |
+| `onError` | `(error) => void` | – | Error handler |
 | `enableCropping` | `boolean` | `false` | Enable image cropping |
 | `cropperCircleOverlay` | `boolean` | `false` | Circular crop overlay |
-| `compressQuality` | `number` | `0.8` | Image compression (0-1) |
+| `compressQuality` | `number` | `0.8` | Image compression (0–1) |
 | `multiple` | `boolean` | `false` | Allow multiple selection |
 
 ---
 
+### ImageViewModal & WebViewModal
+
+Full-screen image viewer and an in-app WebView modal, both available from `@components`.
+
+---
+
 ## State Management
+
+State is split into two layers:
+
+- **Redux Toolkit** for persistent domain state (`auth`, `lang`, `theme`) — survives app restarts via `redux-persist` + encrypted MMKV.
+- **Zustand** for ephemeral UI state (`loader`, `toast`, `popup`, `errorScreen`) — fast, component-free updates with non-hook helpers usable from interceptors.
 
 ### Redux Store Structure
 
@@ -825,97 +881,104 @@ import { CommonImagePickerModal } from '@components';
 {
   auth: {
     isAuthenticated: boolean;
-    userData: object | null;
+    userData: any;
     accessToken: string | null;
     refreshToken: string | null;
-  },
-  loader: {
-    status: boolean;
-  },
-  toast: {
-    status: boolean;
-    type: 'success' | 'error' | 'info' | 'warn';
-    title: string;
-    message: string;
-    duration: number;
-  },
-  errorScreen: {
-    status: boolean;
-    title: string;
-    message: string;
-    buttonLabel: string;
-    networkConfig: object | null;
-  },
-  popup: {
-    status: boolean;
-    title: string;
-    buttonLabel: string;
-    onPressType: string;
   },
   lang: {
     selectedLang: string;
   },
   theme: {
-    theme: object;
+    theme: AppTheme;
   }
 }
 ```
+
+The persist whitelist is `['auth', 'theme', 'lang']`.
 
 ### Using Redux
 
 ```tsx
 import { useAppDispatch, useAppSelector } from '@redux';
-import { loginReducer, logoutReducer } from '@redux';
+import { loginReducer, logoutReducer, refreshTokenReducer } from '@redux';
 
-// Read state
 const { isAuthenticated, userData } = useAppSelector(state => state.auth);
-
-// Dispatch actions
 const dispatch = useAppDispatch();
 
 dispatch(loginReducer({
-  isAuthenticated: true,
-  userData: user,
-  accessToken: token,
-  refreshToken: refresh,
+  userData,
+  accessToken,
+  refreshToken,
 }));
 
+dispatch(refreshTokenReducer({ accessToken, refreshToken }));
 dispatch(logoutReducer());
+```
+
+### Zustand UI Store (`@stores`)
+
+```tsx
+import {
+  useUIStore,
+  showToast, hideToast,
+  showLoader, hideLoader,
+  showPopup, hidePopup,
+  showErrorScreen, hideErrorScreen,
+} from '@stores';
+
+// Inside a component — selector subscription
+const loaderVisible = useUIStore(state => state.loader.status);
+
+// Anywhere (interceptors, services, plain functions)
+showLoader();
+showToast({ type: 'info', message: 'Saved', duration: 2000 });
 ```
 
 ### Available Actions
 
-| Slice | Actions |
-|-------|---------|
-| `auth` | `loginReducer`, `logoutReducer`, `refreshTokenReducer` |
-| `loader` | `showLoader`, `hideLoader` |
-| `toast` | `showToast`, `hideToast` |
-| `errorScreen` | `showErrorScreen`, `hideErrorScreen` |
-| `popup` | `showPopup`, `hidePopup` |
-| `lang` | `selectLang`, `defaultLang` |
-| `theme` | `selectTheme`, `defaultTheme` |
+| Layer | Slice / Store | Actions |
+|-------|--------------|---------|
+| Redux | `auth` | `loginReducer`, `logoutReducer`, `refreshTokenReducer` |
+| Redux | `lang` | `selectLang`, `defaultLang` |
+| Redux | `theme` | `selectTheme`, `defaultTheme` |
+| Zustand | `useUIStore.loader` | `showLoader`, `hideLoader` |
+| Zustand | `useUIStore.toast` | `showToast`, `hideToast` |
+| Zustand | `useUIStore.popup` | `showPopup`, `hidePopup` |
+| Zustand | `useUIStore.errorScreen` | `showErrorScreen`, `hideErrorScreen` |
 
-### Secure Persistence
+### Encrypted Persistence
 
-Redux state is automatically persisted using a custom Keychain storage adapter that encrypts data before storing.
+Redux state is persisted through `MMKVStorageAdapter`, which wraps an MMKV instance encrypted with a 256-bit master key kept in the OS Keychain (`AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY` accessibility). The same MMKV instance is reused by the TanStack Query persister.
 
 ---
 
 ## Networking Layer
 
-### NetworkManager
+### Architecture
 
-Central middleware for all API calls with automatic encryption, token injection, and error handling.
+The network layer is split into focused units:
+
+| File | Responsibility |
+|------|---------------|
+| `network/client/axiosClient.ts` | Single shared `axios.create({...})` instance |
+| `network/client/interceptors.ts` | Auth token injection, AES request/response encryption, 401 logout, offline error screen |
+| `network/middleware/Network_Manager.ts` | Thin wrapper that runs the request and normalizes the response into `NetworkResponse<T>` |
+| `network/networkCache/queryClient.ts` | TanStack Query `QueryClient`, NetInfo bridge, global error toast |
+| `network/networkCache/QueryProvider.tsx` | `PersistQueryClientProvider` wiring |
+| `network/networkCache/queryPersister.ts` | Cache persister using the encrypted MMKV instance |
+| `network/networkCache/queryKeys.ts` | Centralized query-key factory |
+
+`NetworkManager` deliberately does **not** touch Redux or the UI store, dispatch toasts, or branch on endpoint strings — those concerns live in interceptors and TanStack Query's per-query handlers.
+
+### NetworkManager
 
 ```tsx
 import { NetworkManager } from '@network';
-import { API } from '@network';
+import { API } from '@network/apis/endpoints/Endpoints';
 
-// Basic API call
 const response = await NetworkManager({
   api: API.Authenticated.FETCH_PROFILE,
   apiParams: { userId: 123 },
-  apiBody: {},
 });
 
 if (response.success) {
@@ -924,19 +987,21 @@ if (response.success) {
   console.error(response.error);
 }
 
-// With React Query integration (skip default toast/error handling)
-const response = await NetworkManager({
-  api: API.NonAuthenticated.LOGIN,
-  apiBody: { email, password },
-  skipToast: true,
-  skipErrorScreen: true,
+// Multipart request (build FormData at the call site)
+const fd = new FormData();
+fd.append('profilePic', file);
+fd.append('reqData', UtilsFunc.encryptData(JSON.stringify(payload)));
+
+await NetworkManager({
+  api: API.NonAuthenticated.SIGNUP,
+  apiFormData: fd,
 });
 ```
 
 ### NetworkResponse Type
 
 ```typescript
-interface NetworkResponse<T = any> {
+interface NetworkResponse<T = unknown> {
   success: boolean;
   data: T | null;
   error: string;
@@ -945,30 +1010,44 @@ interface NetworkResponse<T = any> {
 }
 ```
 
-### React Query Hooks
+### TanStack Query Hooks
 
-Pre-built mutation hooks for common operations:
+Pre-built mutation and query hooks live in `network/apis/services/`.
 
 ```tsx
-import { useLoginMutation, useLogoutMutation } from '@network';
+import {
+  useLoginMutation,
+  useRegisterMutation,
+  useSendOtpMutation,
+  useVerifyOtpMutation,
+  useLogoutMutation,
+  useUpdateToken,
+  useUserProfileQuery,
+  usePrivacyPolicyQuery,
+  useTermsConditionQuery,
+} from '@network';
 
-// Login mutation
-const loginMutation = useLoginMutation({
-  onSuccess: (data) => {
-    dispatch(loginReducer(data));
-  },
-  onError: (error) => {
-    console.error(error);
+// Mutation
+const login = useLoginMutation({
+  onSuccess: (res) => {
+    if (res.success) {
+      dispatch(loginReducer({ userData: res.data, accessToken, refreshToken }));
+    }
   },
 });
 
-loginMutation.mutate({ email, password });
+login.mutate({ email, password });
 
-// Check loading state
-if (loginMutation.isPending) {
-  // Show loading
-}
+// Query — guard with `enabled` so it doesn't fire on the login screen
+const { data, isLoading } = useUserProfileQuery({ enabled: isAuthenticated });
 ```
+
+### Offline Behavior
+
+- `onlineManager` is bridged to `@react-native-community/netinfo` so queries pause on connectivity loss and resume on reconnect.
+- The default `networkMode` is `'offlineFirst'` for both queries and mutations — cached data is served immediately and the network call is queued.
+- The TanStack Query cache is persisted to encrypted MMKV (24h `maxAge`, `buster: 'v1'` — bump it when query shapes change).
+- The axios response interceptor shows a retryable error screen when offline and clears it on the next successful response.
 
 ### Defining API Endpoints
 
@@ -977,129 +1056,119 @@ Add endpoints in `src/network/apis/endpoints/Endpoints.ts`:
 ```typescript
 export const API = {
   NonAuthenticated: {
-    LOGIN: { endpoint: 'api/user/v1/auth/login', method: HTTP_METHODS.POST },
-    SIGNUP: { endpoint: 'api/user/v1/auth/register', method: HTTP_METHODS.POST },
-    FORGOT_PASSWORD: { endpoint: 'api/user/v1/auth/forgot', method: HTTP_METHODS.POST },
+    PRIVACY_POLICY:    { endpoint: 'privacy-policy',         method: HTTP_METHODS.GET  },
+    TERMS_CONDITION:   { endpoint: 'user/v1/account/list',   method: HTTP_METHODS.GET  },
+    LOGIN:             { endpoint: 'user/v1/auth/login',     method: HTTP_METHODS.POST },
+    SIGNUP:            { endpoint: 'api/user/v1/auth/register', method: HTTP_METHODS.POST },
+    FORGET_PASSWORD:   { endpoint: 'auth/forgot-password',   method: HTTP_METHODS.POST },
+    SENDOTP:           { endpoint: 'api/user/v1/auth/sendotp', method: HTTP_METHODS.POST },
   },
   Authenticated: {
-    FETCH_PROFILE: { endpoint: 'api/user/v1/account/profile', method: HTTP_METHODS.GET },
-    LOGOUT: { endpoint: 'api/user/v1/auth/logout', method: HTTP_METHODS.POST },
-    REFRESH_TOKEN: { endpoint: 'api/user/v1/auth/refresh', method: HTTP_METHODS.POST },
+    LOGOUT:        { endpoint: 'auth/logout',        method: HTTP_METHODS.GET },
+    REFRESH_TOKEN: { endpoint: 'auth/refresh-token', method: HTTP_METHODS.GET },
+    FETCH_PROFILE: { endpoint: 'profile',            method: HTTP_METHODS.GET },
   },
 };
+```
+
+### Query Keys
+
+```typescript
+import { queryKeys } from '@network';
+
+queryClient.invalidateQueries({ queryKey: queryKeys.authenticated.all });
+queryClient.invalidateQueries({ queryKey: queryKeys.authenticated.profile() });
 ```
 
 ---
 
 ## Navigation
 
-### Navigation Structure
+### Navigation Tree
 
 ```
-InitialNavigator
-└── RootNavigator
-    ├── SplashStack
-    │   └── Splash (auth check)
-    ├── AuthStack (non-authenticated)
-    │   ├── Onboard
-    │   ├── Login
-    │   ├── Signup
-    │   ├── ForgotPassword
-    │   └── OTP
-    └── AppStack (authenticated)
-        ├── Home
-        └── Profile
+InitialNavigator (Providers + global overlays)
+└── ThemedNavigationContainer
+    └── RootNavigator
+        ├── SplashStack
+        │   └── Splash (auth check)
+        ├── AuthStack       (non-authenticated)
+        │   ├── Onboard
+        │   ├── Login
+        │   ├── Signup
+        │   ├── ForgotPassword
+        │   └── OTP
+        └── AppStack        (authenticated)
+            ├── Home
+            └── Profile
 ```
+
+`InitialNavigator` also mounts `<Loader />`, `<CommonToaster />`, `<CommonPopup />`, and `<CommonErrorScreen />` once at the root so they're available app-wide.
 
 ### Using Navigation
 
 ```tsx
 import { useNavs } from '@hooks';
 
-// Navigate to screen
 useNavs.navigate('Home', { userId: 123 });
-
-// Go back
 useNavs.goback();
+useNavs.push('Profile', { userId: 123 });
+useNavs.replace('Login');
+useNavs.pop(2);
 
-// Reset navigation stack
 useNavs.reset({
   index: 0,
   routes: [{ name: 'AppStack' }],
 });
-
-// Push to stack
-useNavs.push('Profile', { userId: 123 });
-
-// Replace current screen
-useNavs.replace('Login');
-
-// Pop screens
-useNavs.pop(2); // Go back 2 screens
 ```
+
+The shared `navigationRef` is also exported from `@hooks` for use outside React components.
 
 ---
 
 ## Theming
 
-### Using Themes
+The theme provider is local React state with three modes — `light`, `dark`, `system` — and reactively follows the OS color scheme when in `system` mode. It also drives the StatusBar style.
+
+### Using the Theme
 
 ```tsx
 import { useTheme } from '@themes';
 
 const MyComponent = () => {
-  const { theme, currentThemeName, setTheme } = useTheme();
+  const { theme, themeMode, isDark, setThemeMode, toggleTheme } = useTheme();
 
   return (
     <View style={{ backgroundColor: theme.colors.primary }}>
       <Text style={{ color: theme.colors.text1 }}>
-        Current theme: {currentThemeName}
+        Mode: {themeMode} (dark: {String(isDark)})
       </Text>
-      <Button onPress={() => setTheme('dark')} title="Dark Mode" />
+      <Button title="Dark"   onPress={() => setThemeMode('dark')} />
+      <Button title="Light"  onPress={() => setThemeMode('light')} />
+      <Button title="System" onPress={() => setThemeMode('system')} />
+      <Button title="Toggle" onPress={toggleTheme} />
     </View>
   );
 };
 ```
 
-### Theme Structure
+### Theme Shape
 
 ```typescript
 {
   name: 'light' | 'dark',
   colors: {
-    // Primary colors
-    primary: string,
-    secondary: string,
-    tertiary: string,
-    quaternary: string,
-    quinary: string,
-    senary: string,
-
-    // Status colors
-    error: string,
-    success: string,
-    warning: string,
-    info: string,
-
-    // Light status colors (for backgrounds)
-    lightError: string,
-    lightSuccess: string,
-    lightWarning: string,
-    lightInfo: string,
-
-    // Text colors
-    text1: string,
-    text2: string,
-    lightText: string,
-
-    // Other
-    borderColor1: string,
-    grey1: string,
-    grey2: string,
-    white: string,
-    black: string,
-    transparent0: string,
-    // ... and more
+    // Primary
+    primary, secondary, tertiary, quaternary, quinary, senary,
+    // Status
+    error, success, warning, info,
+    // Light status (backgrounds)
+    lightError, lightSuccess, lightWarning, lightInfo,
+    // Text
+    text1, text2, lightText,
+    // Misc
+    borderColor1, grey1, grey2, white, black, transparent0,
+    background, // ...and more
   }
 }
 ```
@@ -1107,22 +1176,15 @@ const MyComponent = () => {
 ### Global Styles
 
 ```tsx
-import { GlobalStyles } from '@themes';
+import { useTheme, GlobalStyles } from '@themes';
 
 const { theme } = useTheme();
 const globalStyles = GlobalStyles(theme);
 
-<View style={globalStyles.centerContent}>
-  <View style={globalStyles.commonShadow}>
-    {/* Content */}
-  </View>
-</View>
+<View style={[globalStyles.commonShadow, globalStyles.centerContent]} />
 
-// Available global styles:
-// - centerContent: Center align content
-// - commonBox: Full screen container
-// - commonModalBox: Modal container
-// - commonShadow: Shadow styling
+// Available helpers:
+// - centerContent, commonBox, commonModalBox, commonShadow
 ```
 
 ---
@@ -1131,55 +1193,45 @@ const globalStyles = GlobalStyles(theme);
 
 ### useValidators
 
-Form validation utilities with comprehensive rules.
+Form validation utilities.
 
 ```tsx
 import { useValidators } from '@hooks';
 
-// Email validation
-const emailResult = useValidators.email('test@example.com');
-// { status: true, msg: '' }
-// { status: false, msg: 'Email ID is not valid' }
+useValidators.email('test@example.com');
+// → { status: true, msg: '' } | { status: false, msg: 'Email ID is not valid' }
 
-// Phone validation (Indian format)
-const phoneResult = useValidators.phoneNumber('9876543210');
-// { status: true, msg: '' }
-// { status: false, msg: 'Mobile No. should start with digits 6, 7, 8, or 9.' }
+useValidators.phoneNumber('9876543210');
+// → must be 10 digits, must start with 6/7/8/9, must not be all-same digits
 
-// Password validation
-// Requirements: min 8 chars, 1 uppercase, 1 number, 1 special character
-const passwordResult = useValidators.password('Test@123');
-// { status: true, msg: '' }
-// { status: false, msg: 'Password should have 1 uppercase letter.' }
+useValidators.password('Test@1234');
+// → ≥ 8 chars, 1 uppercase, 1 digit, 1 special
 
-// OTP validation
-const otpResult = useValidators.otp(['1', '2', '3', '4', '5', '6']);
-// { status: true, msg: '' }
+useValidators.otp(['1', '2', '3', '4', '5', '6']);
 ```
 
 ### useTryCatch
 
-Promise error handling utility with discriminated union return type.
+Promise error-handling utility with a discriminated-union return.
 
 ```tsx
 import { useTryCatch } from '@hooks';
 
-const { data, error } = await useTryCatch(someAsyncFunction());
-
+const { data, error } = await useTryCatch(someAsyncFn());
 if (error) {
-  console.error('Error:', error);
+  console.error(error);
 } else {
-  console.log('Success:', data);
+  console.log(data);
 }
 ```
 
-### useNavs
+### useNavs / navigationRef
 
-Navigation utility hook (see Navigation section).
+See [Navigation](#navigation).
 
-### useAppDispatch & useAppSelector
+### useAppDispatch / useAppSelector
 
-Typed Redux hooks (see State Management section).
+Typed Redux hooks — see [State Management](#state-management).
 
 ---
 
@@ -1192,23 +1244,15 @@ import {
   responsiveHeight,
   responsiveWidth,
   responsiveFontSize,
-  SCREEN_WIDTH,
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
   SCREEN_HEIGHT,
+  SCREEN_WIDTH,
 } from '@utils';
 
-// Static utilities
-const height = responsiveHeight(10);  // 10% of screen height
-const width = responsiveWidth(50);    // 50% of screen width
-const fontSize = responsiveFontSize(2);
-
-// Screen dimensions
-console.log(SCREEN_WIDTH, SCREEN_HEIGHT);
-
-// Hook versions (re-calculate on dimension changes)
-import { useResponsiveHeight, useResponsiveWidth } from '@utils';
-
-const height = useResponsiveHeight(10);
-const width = useResponsiveWidth(50);
+const h = responsiveHeight(10);  // 10% of screen height
+const w = responsiveWidth(50);   // 50% of screen width
 ```
 
 ### Pixelate Utilities
@@ -1216,11 +1260,11 @@ const width = useResponsiveWidth(50);
 ```tsx
 import { Pixelate } from '@utils';
 
-Pixelate.widthNormalizer(100);   // Normalize width based on design
-Pixelate.heightNormalizer(100);  // Normalize height based on design
-Pixelate.fontPixel(16);          // Normalize font size
-Pixelate.screenWidth;            // Current screen width
-Pixelate.screenHeight;           // Current screen height
+Pixelate.widthNormalizer(100);
+Pixelate.heightNormalizer(100);
+Pixelate.fontPixel(16);
+Pixelate.screenWidth;
+Pixelate.screenHeight;
 ```
 
 ### Encryption Utilities
@@ -1228,11 +1272,24 @@ Pixelate.screenHeight;           // Current screen height
 ```tsx
 import { UtilsFunc } from '@utils';
 
-// Encrypt data (AES-256-CBC)
-const encrypted = UtilsFunc.encryptData(JSON.stringify(data));
-
-// Decrypt data
+const encrypted = UtilsFunc.encryptData(JSON.stringify(data)); // AES-256-CBC
 const decrypted = JSON.parse(UtilsFunc.decryptData(encrypted));
+```
+
+### Secure Storage (MMKV)
+
+```tsx
+import { initSecureStorage, getSecureStorage, MMKVStorageAdapter } from '@utils';
+
+// Bootstrap (called once in index.js to warm up the master key)
+await initSecureStorage();
+
+// Read/write directly after init
+const storage = getSecureStorage();
+storage.set('key', 'value');
+storage.getString('key');
+
+// Or use MMKVStorageAdapter as a redux-persist storage backend
 ```
 
 ---
@@ -1241,45 +1298,29 @@ const decrypted = JSON.parse(UtilsFunc.decryptData(encrypted));
 
 ### API Encryption
 
-- **Algorithm**: AES-256-CBC
-- **Request Encryption**: All API request bodies are encrypted before sending
-- **Response Decryption**: All API responses are decrypted automatically
-- **URL Parameters**: Query parameters are also encrypted
+- **Algorithm:** AES-256-CBC, performed in the axios request/response interceptors.
+- **Request encryption:** JSON bodies are wrapped as `{ reqData: <ciphertext> }`. FormData payloads encrypt only the `reqData` field — file parts pass through.
+- **Query parameters:** Object query params are also encrypted into `{ reqData: <ciphertext> }`.
+- **Response decryption:** The response interceptor parses `{ data: <ciphertext> }` into the decrypted payload before it reaches `NetworkManager`.
 
-### Secure Storage
+### Encrypted Storage
 
-- Redux state is persisted using React Native Keychain
-- Hardware-backed encryption on supported devices
-- Automatic encryption/decryption of persisted state
+- A single encrypted MMKV instance (`secure.store`) backs both `redux-persist` and the TanStack Query cache.
+- The MMKV encryption key is a 256-bit value generated on first launch and stored in the OS Keychain (`AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY`).
+- `initSecureStorage()` is called in `index.js` so the master key is warm before persistors attach.
 
 ### Token Management
 
-- Access tokens stored securely in Keychain
-- Automatic token injection in API request headers
-- 401 response handling with automatic logout
-- Refresh token support for session renewal
-
----
-
-## Scripts
-
-| Script | Description |
-|--------|-------------|
-| `npm start` | Start Metro bundler |
-| `npm run android` | Run on Android |
-| `npm run ios` | Run on iOS |
-| `npm run lint` | Run ESLint |
-| `npm run test` | Run Jest tests |
-| `npm run android-clean` | Clean and run Android |
-| `npm run ios-clean` | Clean pods and run iOS |
-| `npm run android-release` | Build Android release |
-| `npm run deep-clean` | Full clean and reinstall |
+- Access tokens live in Redux `auth` (persisted via the encrypted MMKV adapter).
+- The axios request interceptor injects the access token into the `Authorization` header on every request.
+- **401 handling:** the response interceptor dispatches `logoutReducer()` and shows a session-expired toast.
+- A `refreshTokenReducer` and `useUpdateToken` hook are wired up for refresh flows.
 
 ---
 
 ## Path Aliases
 
-Clean imports using TypeScript path aliases:
+Defined in both `babel.config.js` (module-resolver) and `tsconfig.json` (paths):
 
 ```typescript
 @icons      → ./src/assets/icons/index.ts
@@ -1291,6 +1332,7 @@ Clean imports using TypeScript path aliases:
 @screens    → ./src/screens/index.ts
 @network    → ./src/network/index.ts
 @redux      → ./src/redux/index.ts
+@stores     → ./src/stores/index.ts
 @themes     → ./src/themes/index.ts
 @utils      → ./src/utils/index.ts
 ```
@@ -1299,18 +1341,109 @@ Clean imports using TypeScript path aliases:
 
 ## Adding New Icons
 
-1. Add your SVG file to `src/assets/icons/list/`
-2. Import it in `src/assets/icons/index.ts`
-3. Add the icon name to `IconTypes` type
-4. Register it in the `SVG_COMPONENTS` map in `CommonImage.tsx`
+1. Add your SVG file to `src/assets/icons/list/`.
+2. Import and re-export it in `src/assets/icons/index.ts`.
+3. Add the icon name to the `IconTypes` union.
+4. Register the component in the `SVG_COMPONENTS` map in `CommonImage.tsx`:
 
 ```tsx
-// In CommonImage.tsx, add to SVG_COMPONENTS:
 const SVG_COMPONENTS: Record<IconTypes, React.FC<any>> = {
-  // ... existing icons
+  // ...
   your_icon: YourIconSvg,
 };
 ```
+
+---
+
+## Scripts
+
+| Script | Description |
+|--------|-------------|
+| `npm start` | Reset watchman + Metro cache and start the bundler |
+| `npm run android` | Run on Android |
+| `npm run android-clean` | `gradlew clean` then run on Android |
+| `npm run android-release` | Build the prod release APK/AAB |
+| `npm run ios` | Run on iOS |
+| `npm run ios-clean` | Wipe Pods + build, reinstall pods, run on iOS |
+| `npm run lint` | Run ESLint |
+| `npm run test` | Run Jest tests |
+| `npm run deep-clean` | Wipe `node_modules`, gradle, pods, build artifacts, and reinstall via pnpm |
+| `npm run rename` | Rename the app via `react-native-rename` |
+| `npm run prepare` | Husky setup (runs automatically after install) |
+
+---
+
+## Git Conventions
+
+### Branch Naming
+
+All branches must follow this naming convention — the CI pipeline will reject branches that don't match:
+
+| Prefix | When to Use | Example |
+|--------|-------------|---------|
+| `feature/` | New features, screens, or enhancements | `feature/add-profile-screen` |
+| `bugFix/` | Bug fixes | `bugFix/fix-login-crash` |
+
+### Commit Message Format
+
+This project enforces **Conventional Commits**. Every commit message must follow:
+
+```
+type(optional-scope): description
+```
+
+**Available types:**
+
+| Type | When to Use | Example |
+|------|-------------|---------|
+| `feat` | New feature or capability | `feat: add forgot password screen` |
+| `fix` | A bug fix | `fix: resolve crash on empty cart` |
+| `refactor` | Restructuring code without changing behavior | `refactor: extract API logic into custom hook` |
+| `style` | Visual/UI changes or code formatting | `style: update login button colors to match theme` |
+| `chore` | Maintenance — deps, CI, build scripts | `chore: upgrade react-native to 0.84` |
+| `docs` | Documentation only | `docs: add setup instructions to README` |
+| `perf` | Performance improvements | `perf: memoize FlatList renderItem` |
+| `test` | Adding or updating tests | `test: add unit tests for login screen` |
+
+**Scope** (optional): which module/area is affected.
+
+Examples: `feat(auth): implement biometric login`, `fix(navigation): back button not working on Android`, `refactor(redux): simplify auth slice`.
+
+---
+
+## CI/CD Pipeline
+
+The project ships a 4-stage GitLab CI pipeline that runs automatically on every Merge Request. All stages must pass before merging.
+
+### Pipeline Stages
+
+| Stage | Job | What It Checks |
+|-------|-----|---------------|
+| 1. Compliance | `compliance_checks` | Branch naming convention, MR size limit (max 50 files), conventional commit messages |
+| 2. Code Quality | `eslint` | Linting via `@react-native/eslint-config` |
+| | `typescript` | `tsc --noEmit` in strict mode |
+| | `prettier` | Formatting consistency |
+| 3. Structural Review | `danger_review` | Folder structure, import discipline, optional chaining patterns, barrel exports, sensitive files, naming |
+| 4. AI Review | `ai_review` | Claude-powered review against project guidelines (only if all previous stages pass) |
+
+### What Gets Checked
+
+**Compliance (Stage 1):** branch starts with `feature/` or `bugFix/`; conventional commits; ≤ 50 non-asset files.
+
+**Code Quality (Stage 2):** ESLint (no inline styles, no unused vars, file size limits), TypeScript strict, Prettier.
+
+**Structural Review (Stage 3 — Danger.js):**
+- MR description ≥ 20 chars; no new `.js` files (TypeScript only).
+- Screens, hooks, components, network, and redux files must live in correct directories.
+- No direct `axios`, `fetch()`, or `AsyncStorage` imports — use `NetworkManager` and the encrypted MMKV adapter via `redux-persist`.
+- No `console.log` in production code.
+- Use path aliases (`@components`, `@hooks`, …) over deep relative imports.
+- Use theme colors over hardcoded hex.
+- Update barrel `index.ts` files when adding new modules.
+- No `.env` file changes in feature MRs.
+- Optional-chaining sanity (excessive depth, redundant `?.`, missing `?.` on API responses, contradictory `?.` with `!`).
+
+**AI Review (Stage 4):** Claude analyzes the full MR diff against project guidelines and posts feedback with severity levels (BLOCKER, WARNING, SUGGESTION) directly on the MR.
 
 ---
 
