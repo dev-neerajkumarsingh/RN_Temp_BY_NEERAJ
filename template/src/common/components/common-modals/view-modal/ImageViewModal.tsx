@@ -2,7 +2,6 @@ import * as React from 'react';
 import { Modal, Pressable } from 'react-native';
 import { CommonBox, CommonImage } from '@components';
 import { Pixelate } from '@utils';
-import { useTheme } from '@themes';
 import { useModalStyles } from './Styles';
 
 type Props = {
@@ -11,13 +10,12 @@ type Props = {
   onPressClose: () => void;
 };
 
-export const ImageViewModal: React.FC<Props> = ({
+const ImageViewModalComponent: React.FC<Props> = ({
   status,
   source,
   onPressClose,
 }) => {
   const styles = useModalStyles();
-  const { theme } = useTheme();
 
   if(!status) {
     return null;
@@ -43,10 +41,12 @@ export const ImageViewModal: React.FC<Props> = ({
             svgSource="close"
             width={22}
             height={22}
-            color={theme.colors.black}
+            color={'black'}
           />
         </Pressable>
       </CommonBox>
     </Modal>
   );
 };
+
+export const ImageViewModal = React.memo(ImageViewModalComponent);

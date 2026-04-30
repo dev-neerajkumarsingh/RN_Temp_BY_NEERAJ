@@ -23,7 +23,7 @@ type Props = {
   scrollEnabled?: boolean;
 };
 
-export const CommonBox: React.FC<Props> = ({
+const CommonBoxComponent: React.FC<Props> = ({
   children = <></>,
   loaderStatus = false,
   moreStyles = {},
@@ -84,3 +84,5 @@ export const CommonBox: React.FC<Props> = ({
     </View>
   );
 };
+
+export const CommonBox = React.memo(CommonBoxComponent);

@@ -11,6 +11,7 @@ import {
   FocusEvent,
 } from 'react-native';
 import { useTheme } from '@themes';
+import type { ColorKey } from '@themes';
 import { CommonText, CommonImage } from '@components';
 import { useInpuptStyles } from './Styles';
 import { Pixelate, responsiveFontSize } from '@utils';
@@ -18,14 +19,14 @@ import type { IconTypes } from '@icons';
 
 type Props = {
   placeholder?: string;
-  placeholderTextColor?: string;
+  placeholderTextColor?: ColorKey | (string & {});
   value: string;
-  inputColor?: string;
+  inputColor?: ColorKey | (string & {});
   onChangeText: (text: string) => void;
   moreInputStyle?: StyleProp<ViewStyle>;
   moreRightContainerStyle?: StyleProp<ViewStyle>;
   secureTextEntry?: boolean;
-  cursorColor?: string;
+  cursorColor?: ColorKey | (string & {});
   fontFamily?: string;
   keyboardType?: 'default' | 'numeric' | 'email-address' | 'phone-pad';
   multiline?: boolean;
@@ -42,11 +43,12 @@ type Props = {
   leftIconSource?: 'url' | 'localNonSvg' | 'localSvg';
   leftIconWidth?: number;
   leftIconHeight?: number;
-  leftIconColor?: string;
+  leftIconColor?: ColorKey | (string & {});
   rightIcon?: IconTypes;
   rightIconSource?: 'url' | 'localNonSvg' | 'localSvg';
   rightIconWidth?: number;
   rightIconHeight?: number;
+  rightIconColor?: ColorKey | (string & {});
   textAlignVertical?: 'auto' | 'top' | 'bottom' | 'center';
   onPressRightIcon?: (text: string) => void;
   msgError?: string;
@@ -70,14 +72,14 @@ type Props = {
   // New props for X-style animation
   enableFloatingLabel?: boolean;
   //floatingLabelColor?: string;
-  focusedBorderColor?: string;
+  focusedBorderColor?: ColorKey | (string & {});
   imgSource?: string;
   leftEmptyBoxStyle?: ViewStyle;
   disabledContainerStyle?: ViewStyle;
   onSubmitEditing?: () => void;
 };
 
-export const CommonInput: React.FC<Props> = ({
+const CommonInputComponent: React.FC<Props> = ({
   moreContainerStyle,
   placeholder,
   placeholderTextColor,
@@ -120,6 +122,7 @@ export const CommonInput: React.FC<Props> = ({
   disableError = false,
   renderLeftIcon,
   renderRightIcon,
+  rightIconColor,
   // New props
   enableFloatingLabel = false,
   //floatingLabelColor = '#000',
@@ -138,20 +141,23 @@ export const CommonInput: React.FC<Props> = ({
   const [isFocused, setIsFocused] = React.useState(false);
 
   // Handle focus animation
-  const handleFocus = (event: FocusEvent) => {
-    setIsFocused(true);
-    if (enableFloatingLabel) {
-      Animated.timing(labelAnimation, {
-        toValue: 1,
-        duration: 200,
-        useNativeDriver: false,
-      }).start();
-    }
-    onFocus && onFocus(event as any);
-  };
+  const handleFocus = React.useCallback(
+    (event: FocusEvent) => {
+      setIsFocused(true);
+      if (enableFloatingLabel) {
+        Animated.timing(labelAnimation, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: false,
+        }).start();
+      }
+      onFocus && onFocus(event as any);
+    },
+    [onFocus, enableFloatingLabel],
+  );
 
   // Handle blur animation
-  const handleBlur = () => {
+  const handleBlur = React.useCallback(() => {
     setIsFocused(false);
     if (enableFloatingLabel && !value) {
       Animated.timing(labelAnimation, {
@@ -161,7 +167,7 @@ export const CommonInput: React.FC<Props> = ({
       }).start();
     }
     onBlur && onBlur();
-  };
+  }, [onBlur, enableFloatingLabel, value]);
 
   // Update animation when value changes externally
   const runLabelAnimation = React.useCallback(() => {
@@ -180,30 +186,42 @@ export const CommonInput: React.FC<Props> = ({
     runLabelAnimation();
   }, [runLabelAnimation]);
 
-  // Animated styles for floating label
-  const labelStyle = {
-    position: 'absolute' as const,
-    left: leftIcon ? 50 : 12,
-    color: placeholderTextColor || theme.colors.textSecondary,
-    backgroundColor:
-      isFocused || value ? theme.colors.primary : theme.colors.transparent0,
-    paddingHorizontal: 3,
-    borderRadius: 5,
-    // zIndex: 10,
-  };
-
-  const animatedLabelStyle = {
-    fontSize: labelAnimation.interpolate({
-      inputRange: [0, 1],
-      outputRange: [responsiveFontSize(2), responsiveFontSize(1.4)],
+  const labelStyle = React.useMemo<TextStyle>(
+    () => ({
+      position: 'absolute',
+      left: leftIcon ? 50 : 12,
+      color: placeholderTextColor || theme.colors.textSecondary,
+      backgroundColor:
+        isFocused || value ? theme.colors.primary : theme.colors.transparent0,
+      paddingHorizontal: 3,
+      borderRadius: 5,
     }),
-    top: labelAnimation.interpolate({
-      inputRange: [0, 1],
-      outputRange: [18, -8],
-    }),
-  };
+    [
+      leftIcon,
+      placeholderTextColor,
+      theme.colors.textSecondary,
+      theme.colors.primary,
+      theme.colors.transparent0,
+      isFocused,
+      value,
+    ],
+  );
 
-  const getBorderColor = () => {
+  const animatedLabelStyle = React.useMemo(
+    () => ({
+      fontSize: labelAnimation.interpolate({
+        inputRange: [0, 1],
+        outputRange: [responsiveFontSize(2), responsiveFontSize(1.4)],
+      }),
+      top: labelAnimation.interpolate({
+        inputRange: [0, 1],
+        outputRange: [18, -8],
+      }),
+    }),
+    [labelAnimation],
+  );
+
+  const getBorderColor = React.useMemo(() => {
     if (!disableError && msgError?.length > 0) {
       return theme.colors.error;
     }
@@ -214,7 +232,12 @@ export const CommonInput: React.FC<Props> = ({
       return theme.colors.senary;
     }
     return theme?.colors.borderColor;
-  };
+  }, [disableError, msgError, theme, isFocused, focusedBorderColor, value]);
+
+  const animatedTextStyle = React.useMemo(
+    () => [labelStyle, animatedLabelStyle, { fontFamily }],
+    [labelStyle, animatedLabelStyle, fontFamily],
+  );
 
   return (
     <>
@@ -222,7 +245,7 @@ export const CommonInput: React.FC<Props> = ({
         style={[
           inputStyles.container,
           {
-            borderColor: getBorderColor(),
+            borderColor: getBorderColor,
             backgroundColor: theme.colors.primary,
           },
           moreContainerStyle,
@@ -230,10 +253,7 @@ export const CommonInput: React.FC<Props> = ({
         ]}>
         {/* Floating Label */}
         {enableFloatingLabel && placeholder && (
-          <Animated.Text
-            style={[labelStyle, animatedLabelStyle, { fontFamily }]}>
-            {placeholder}
-          </Animated.Text>
+          <Animated.Text style={animatedTextStyle}>{placeholder}</Animated.Text>
         )}
 
         <View style={[inputStyles.leftContainer, moreInputStyle]}>
@@ -329,7 +349,7 @@ export const CommonInput: React.FC<Props> = ({
                     svgSource={rightIcon}
                     width={rightIconWidth}
                     height={rightIconHeight}
-                    color={theme.colors.black}
+                    color={rightIconColor}
                   />
                 )}
           </Pressable>
@@ -345,7 +365,7 @@ export const CommonInput: React.FC<Props> = ({
       {!disableError && msgError && (
         <CommonText
           content={msgError}
-          color={theme.colors.error}
+          color={'error'}
           fontSize={12}
           fontType={'InterBold'}
           moreStyle={[inputStyles.errorText, errorTextStyle]}
@@ -354,3 +374,5 @@ export const CommonInput: React.FC<Props> = ({
     </>
   );
 };
+
+export const CommonInput = React.memo(CommonInputComponent);

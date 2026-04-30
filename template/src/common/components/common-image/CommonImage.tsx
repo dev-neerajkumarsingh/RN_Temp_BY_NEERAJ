@@ -1,13 +1,20 @@
 // CommonImage.js
 
-import * as React from 'react';
-import { Image, ImageStyle, Animated } from 'react-native';
+import React from 'react';
+import {
+  DimensionValue,
+  Image,
+  ImageStyle,
+  Animated,
+  StyleProp,
+} from 'react-native';
 import { IconTypes } from '@icons'; // Assuming these are valid component imports
 import { Pixelate } from '@utils'; // Assuming this is your utility for responsive sizing
-import { useTheme } from '@themes';
 import { useImageStyles } from './Styles';
 import { SvgProps as SvgNativeProps } from 'react-native-svg';
 import FastImage from '@d11/react-native-fast-image';
+import { useTheme } from '@themes';
+import type { ColorKey } from '@themes';
 // import all local images...
 import {
   ArrowLeft,
@@ -21,13 +28,16 @@ import {
   Tick,
   Warning,
   Placeholder,
+  CameraIcon,
+  FilledArrow,
+  Gallery,
 } from '@icons';
 
 type SvgProps = SvgNativeProps & {
-  width?: string | number;
-  height?: string | number;
+  width?: DimensionValue;
+  height?: DimensionValue;
   style?: ImageStyle;
-  color?: string;
+  color?: ColorKey | (string & {});
 };
 
 const ArrowLeftSvg: React.FC<SvgProps> = props => <ArrowLeft {...props} />;
@@ -43,6 +53,9 @@ const InfoSvg: React.FC<SvgProps> = props => <Info {...props} />;
 const TickSvg: React.FC<SvgProps> = props => <Tick {...props} />;
 const WarningSvg: React.FC<SvgProps> = props => <Warning {...props} />;
 const PlaceholderSvg: React.FC<SvgProps> = props => <Placeholder {...props} />;
+const CameraSvg: React.FC<SvgProps> = props => <CameraIcon {...props} />;
+const FilledArrowSvg: React.FC<SvgProps> = props => <FilledArrow {...props} />;
+const GallerySvg: React.FC<SvgProps> = props => <Gallery {...props} />;
 
 const SVG_COMPONENTS: Record<IconTypes, React.FC<any>> = {
   arrowleft: ArrowLeftSvg,
@@ -56,27 +69,30 @@ const SVG_COMPONENTS: Record<IconTypes, React.FC<any>> = {
   tick: TickSvg,
   warning: WarningSvg,
   placeholder: PlaceholderSvg,
+  camera: CameraSvg,
+  filledArrow: FilledArrowSvg,
+  gallery: GallerySvg,
 };
 
 type Props = {
   sourceType: 'url' | 'localNonSvg' | 'localSvg';
-  source?: string | number; // Can be a URL string or a require() number
+  source?: string | any; // Can be a URL string or a require() number
   svgSource?: IconTypes;
-  width: string | number;
-  height: string | number;
-  color?: any;
+  width: DimensionValue;
+  height: DimensionValue;
+  color?: ColorKey | (string & {});
   resizeMode?: 'cover' | 'contain' | 'stretch' | 'repeat' | 'center';
-  moreStyles?: ImageStyle; // Use ImageStyle for better type safety
+  moreStyles?: StyleProp<ImageStyle>; // Use ImageStyle for better type safety
   duration?: number;
 };
 
-export const CommonImage: React.FC<Props> = ({
+const CommonImageComponent: React.FC<Props> = ({
   sourceType,
   source,
   svgSource,
   width,
   height,
-  color = '#000',
+  color,
   resizeMode = 'contain',
   moreStyles,
   duration = 500,
@@ -84,16 +100,17 @@ export const CommonImage: React.FC<Props> = ({
   // --- Refactor 2: Memoize Animated.Value ---
   // Use useRef to ensure the animated value persists across re-renders.
   const imageAnimated = React.useRef(new Animated.Value(0)).current;
-  const { theme } = useTheme();
   const styles = useImageStyles();
+  const { theme } = useTheme();
+  const Colors = theme.colors;
 
-  const onImageLoad = () => {
+  const onImageLoad = React.useCallback(() => {
     Animated.timing(imageAnimated, {
       toValue: 1,
       duration: duration,
       useNativeDriver: true,
     }).start();
-  };
+  }, [duration]);
 
   // --- Refactor 3: Clean SVG Rendering ---
   if (sourceType === 'localSvg' && svgSource) {
@@ -106,7 +123,11 @@ export const CommonImage: React.FC<Props> = ({
       <SvgComponent
         width={Pixelate.widthNormalizer(Number(width))}
         height={Pixelate.heightNormalizer(Number(height))}
-        color={color}
+        color={
+          color && color in Colors
+            ? Colors[color as keyof typeof Colors]
+            : color || Colors.primary
+        }
         style={moreStyles}
       />
     );
@@ -183,3 +204,5 @@ export const CommonImage: React.FC<Props> = ({
   // Fallback if no valid condition is met
   return null;
 };
+
+export const CommonImage = React.memo(CommonImageComponent);

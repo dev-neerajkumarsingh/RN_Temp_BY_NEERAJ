@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useTheme } from '@themes';
 import {
   CommonBox,
   CommonButton,
@@ -7,12 +6,10 @@ import {
   CommonInput,
   CommonKeyboardStickyView,
 } from '@components';
-import { useNavs } from '@hooks';
 import { useValidators } from '@hooks';
-import { queryKeys, useLoginMutation, NonAuthenticatedServices } from '@network';
-import { useAppDispatch, loginReducer } from '@redux';
+import { queryKeys, useLoginMutation } from '@network';
 import { useLoginStyles } from './Styles';
-import { useQueryClient, useQuery } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const Login = () => {
   const [states, setStates] = useState({
@@ -22,8 +19,6 @@ export const Login = () => {
     passwordErr: '',
   });
   const styles = useLoginStyles();
-  const { theme } = useTheme();
-  const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
 
   // Get method api call example...
@@ -35,7 +30,7 @@ export const Login = () => {
 
   const login = useLoginMutation({
     onSuccess: data => {
-      console.log(JSON.stringify(data), 'LOGIN_RESPONSE');
+      console.log(JSON.stringify(data), ' <::::::::: LOGIN_RESPONSE');
       queryClient.setQueryData(
         queryKeys.nonAuthenticated.login(),
         data?.data?.user,
@@ -93,7 +88,7 @@ export const Login = () => {
       <CommonBox moreStyles={{ alignItems: 'center' }} scrollEnabled={false}>
         <CommonText
           content={'Login'}
-          color={theme.colors.secondary}
+          color={'secondary'}
           textAlign={'center'}
           fontSize={20}
           lineHeight={30}
@@ -127,7 +122,7 @@ export const Login = () => {
           height={50}
           label="Go To Signup"
           textAlign={'center'}
-          textColor={theme.colors.primary}
+          textColor={'primary'}
           fontSize={20}
           onPress={handleValidation}
           moreButtonStyle={styles.btnStyle}

@@ -6,7 +6,7 @@ import { useNavigation, StackActions } from '@react-navigation/native';
 import { useTheme } from '@themes';
 import { useStyles } from './Styles';
 
-export const CommonPopup = () => {
+const CommonPopupComponent = () => {
   const [states, setStates] = React.useState({ modalStatus: false });
   const { status, title, buttonLabel, onPressType } = useUIStore(
     (state) => state.popup,
@@ -37,8 +37,8 @@ export const CommonPopup = () => {
       <View style={styles.container}>
         <View style={styles.popupContainer}>
           <CommonText
-            color={theme.colors.primary}
-            size={16}
+            color={'primary'}
+            fontSize={16}
             content={title}
             moreStyle={styles.title}
           />
@@ -47,8 +47,8 @@ export const CommonPopup = () => {
               width={'100%'}
               height={35}
               contentType={'text'}
-              textColor={theme.colors.primary}
-              textSize={14}
+              textColor={'primary'}
+              fontSize={14}
               label={buttonLabel}
               onPress={onPressClose}
               moreButtonStyle={styles.buttonStyle}
@@ -59,3 +59,5 @@ export const CommonPopup = () => {
     );
   }
 };
+
+export const CommonPopup = React.memo(CommonPopupComponent);

@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import { useStyles } from './Styles';
 import { CommonImage, CommonText } from '@components';
-import { useTheme } from '@themes';
 import * as ImagePicker from 'react-native-image-crop-picker';
 import { Options } from 'react-native-image-crop-picker';
  
@@ -80,7 +79,6 @@ export const CommonImagePickerModal: React.FC<Props> = ({
   showGallery = true,
 }) => {
   const styles = useStyles();
-  const { theme } = useTheme();
  
   // Merged options
   const getMergedOptions = useCallback(
@@ -275,13 +273,13 @@ export const CommonImagePickerModal: React.FC<Props> = ({
                     svgSource="camera"
                     width={30}
                     height={30}
-                    color={theme.colors.white}
+                    color={'white'}
                   />
                 </View>
               </Pressable>
               <CommonText
                 content={cameraLabel}
-                color={theme.colors.white}
+                color={'white'}
                 fontSize={1.8}
                 moreStyle={styles.label}
               />
@@ -299,13 +297,13 @@ export const CommonImagePickerModal: React.FC<Props> = ({
                     svgSource="gallery"
                     width={30}
                     height={30}
-                    color={theme.colors.white}
+                    color={'white'}
                   />
                 </View>
               </Pressable>
               <CommonText
                 content={galleryLabel}
-                color={theme.colors.white}
+                color={'white'}
                 fontSize={1.8}
                 moreStyle={styles.label}
               />

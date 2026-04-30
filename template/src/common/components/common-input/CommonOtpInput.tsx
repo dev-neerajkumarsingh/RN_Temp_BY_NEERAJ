@@ -1,5 +1,10 @@
 import * as React from 'react';
-import { View, TextInput, Platform, NativeSyntheticEvent, TextInputKeyPressEvent } from 'react-native';
+import {
+  View,
+  TextInput,
+  Platform,
+  TextInputKeyPressEvent,
+} from 'react-native';
 import { useInpuptStyles } from './Styles';
 
 // Type for the TextInput ref
@@ -13,7 +18,7 @@ type Props = {
   // Removed: isOtpValid, handleInputBlur, handleInputFocus
 };
 
-export const CommonOtpInput: React.FC<Props> = ({
+const CommonOtpInputComponent: React.FC<Props> = ({
   otp,
   setOtp,
   otpLength,
@@ -48,13 +53,10 @@ export const CommonOtpInput: React.FC<Props> = ({
   }, [isOtpValid, onValidationChange]);
 
   // ⭐ OPTIMIZED FIX: Reads directly from the stable internal ref
-  const handleIsDigitFilled = React.useCallback(
-    (index: number) => {
-      // Use internalOtpValuesRef.current for the fastest, most direct check
-      return internalOtpValuesRef.current?.[index]?.length === 1;
-    },
-    [],
-  );
+  const handleIsDigitFilled = React.useCallback((index: number) => {
+    // Use internalOtpValuesRef.current for the fastest, most direct check
+    return internalOtpValuesRef.current?.[index]?.length === 1;
+  }, []);
 
   // --- INTERNAL HANDLERS ---
 
@@ -65,7 +67,7 @@ export const CommonOtpInput: React.FC<Props> = ({
 
   const handleInputBlur = React.useCallback(() => {
     // Only clear the focused index after a small delay to allow focus shift between boxes
-    if(otp.length === 0) {
+    if (otp.length === 0) {
       setTimeout(() => setFocusedIndex(-1), 50);
     }
   }, []);
@@ -126,7 +128,7 @@ export const CommonOtpInput: React.FC<Props> = ({
    * Handles the 'backspace' key press for deletion and focus management.
    */
   const handleKeyPress = React.useCallback(
-    (e: NativeSyntheticEvent<TextInputKeyPressEvent>, index: number) => {
+    (e: TextInputKeyPressEvent, index: number) => {
       if (e.nativeEvent.key === 'Backspace') {
         const currentDigit = internalOtpValuesRef.current[index];
 
@@ -181,10 +183,12 @@ export const CommonOtpInput: React.FC<Props> = ({
               }}
               maxLength={Platform.OS === 'android' ? 1 : otpLength}
               keyboardType="numeric"
-              ref={ref => (otpInputs.current[index] = ref)}
+              ref={ref => {
+                otpInputs.current[index] = ref;
+              }}
               onFocus={() => handleInputFocus(index)}
               onBlur={handleInputBlur}
-              onKeyPress={(e: any) => handleKeyPress(e, index)}
+              onKeyPress={e => handleKeyPress(e, index)}
               selection={{ start: digit.length, end: digit.length }}
             />
           );
@@ -192,3 +196,5 @@ export const CommonOtpInput: React.FC<Props> = ({
     </View>
   );
 };
+
+export const CommonOtpInput = React.memo(CommonOtpInputComponent);

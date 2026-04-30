@@ -4,10 +4,11 @@ import type { FontTypes } from '@fonts';
 import * as Fonts from '@fonts';
 import { Pixelate } from '@utils';
 import { useTheme } from '@themes';
+import type { ColorKey } from '@themes';
 
 type Props = {
   content: string;
-  color?: string;
+  color?: ColorKey | (string & {});
   textAlign?: 'left' | 'center' | 'right' | 'justify' | 'auto';
   fontSize?: number;
   lineHeight?: number;
@@ -34,11 +35,15 @@ const CommonTextComponent: React.FC<Props> = ({
 }) => {
   const { theme } = useTheme();
   const Colors = theme.colors;
+
   // Memoize text styles to prevent recalculation on every render
   const textStyle = React.useMemo(
     () => [
       {
-        color: color || Colors.text,
+        color:
+          color && color in Colors
+            ? Colors[color as keyof typeof Colors]
+            : color || Colors.text,
         textAlign,
         fontSize: Pixelate.fontPixel(fontSize),
         lineHeight: Pixelate.fontPixel(lineHeight),

@@ -1,16 +1,16 @@
-import { useTheme } from '@themes';
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
+import type { ColorKey } from '@themes';
 
 type Props = {
   marginVertical?: number;
   marginHorizontal?: number;
-  color?: string;
+  color?: ColorKey | (string & {});
   height?: number;
   moreDesign?: {};
 };
 
-export const HorizontalLine: React.FC<Props> = ({
+const HorizontalLine: React.FC<Props> = ({
   marginVertical = 0,
   marginHorizontal = 0,
   color = '#000', // default black
@@ -40,4 +40,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HorizontalLine;
+export const CommonButton = React.memo(HorizontalLine);

@@ -1,7 +1,6 @@
 import * as React from 'react';
-import {Modal, Pressable, Linking} from 'react-native';
-import {CommonBox, CommonImage} from '@components';
-import { useTheme } from '@themes';
+import { Modal, Pressable, Linking } from 'react-native';
+import { CommonBox, CommonImage } from '@components';
 import { useModalStyles } from './Styles';
 // import Pdf from 'react-native-pdf';
 
@@ -12,13 +11,12 @@ type Props = {
   onPressClose: () => void;
 };
 
-export const WebViewModal: React.FC<Props> = ({
+const WebViewModalComponent: React.FC<Props> = ({
   status,
   source,
   downloadStatus,
   onPressClose,
 }) => {
-  const {theme} = useTheme();
   const styles = useModalStyles();
 
   const onPressDownload = () => {
@@ -27,8 +25,8 @@ export const WebViewModal: React.FC<Props> = ({
 
   if (!status) {
     return null;
-  };
-  
+  }
+
   return (
     <Modal
       visible={status}
@@ -44,13 +42,15 @@ export const WebViewModal: React.FC<Props> = ({
           style={styles.webcontainer}
           trustAllCerts={false}
         /> */}
-        <Pressable style={styles.webcloseButtonContainer} onPress={onPressClose}>
+        <Pressable
+          style={styles.webcloseButtonContainer}
+          onPress={onPressClose}>
           <CommonImage
             sourceType="localSvg"
             svgSource="close"
             width={20}
             height={20}
-            color={theme.colors.black}
+            color={'black'}
           />
         </Pressable>
         {Boolean(downloadStatus) && (
@@ -62,7 +62,7 @@ export const WebViewModal: React.FC<Props> = ({
               svgSource="download"
               width={26}
               height={26}
-              color={theme.colors.primary}
+              color={'primary'}
             />
           </Pressable>
         )}
@@ -70,3 +70,5 @@ export const WebViewModal: React.FC<Props> = ({
     </Modal>
   );
 };
+
+export const WebViewModal = React.memo(WebViewModalComponent);
