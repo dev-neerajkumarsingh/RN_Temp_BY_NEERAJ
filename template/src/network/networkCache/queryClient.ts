@@ -8,55 +8,54 @@ import {
   MutationCache,
   onlineManager,
 } from '@tanstack/react-query';
-import { store as Stores, showToast } from '@redux';
+import { showToast } from '@stores';
 import NetInfo from '@react-native-community/netinfo';
 
-// Setup online manager with NetInfo
-onlineManager.setEventListener(setOnline => {
-  return NetInfo.addEventListener(state => {
+// Bridge NetInfo → TanStack Query's onlineManager so queries know about
+// connectivity changes on RN (no built-in window focus / online events).
+onlineManager.setEventListener((setOnline) => {
+  return NetInfo.addEventListener((state) => {
     setOnline(!!state.isConnected && !!state.isInternetReachable);
   });
 });
 
-// Global error handler
-const handleError = (error: any) => {
-  const dispatch = Stores.dispatch;
+// Global error handler — single source of truth for unhandled query errors.
+// Per-query `onError` callbacks still run; this only catches errors that
+// aren't swallowed by the consumer.
+const handleError = (error: unknown) => {
+  const code = (error as { code?: number })?.code;
+  // 401 is already handled by the axios response interceptor (logout + toast).
+  if (code === 401) return;
 
-  // Only show toast for errors not handled by individual queries
-  if (error?.code !== 401) {
-    dispatch(
-      showToast({
-        type: 'error',
-        title: 'Error',
-        message: error?.message || 'Something went wrong',
-        duration: 3000,
-      }),
-    );
-  }
+  const message =
+    (error as { message?: string })?.message ?? 'Something went wrong';
+  showToast({
+    type: 'error',
+    title: 'Error',
+    message,
+    duration: 3000,
+  });
 };
 
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // Global defaults for all queries
-      staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
-      gcTime: 10 * 60 * 1000, // Cache data for 10 minutes (formerly cacheTime)
-      retry: 2, // Retry failed requests 2 times
-      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
-      refetchOnWindowFocus: false, // Don't refetch on app focus (can enable if needed)
-      refetchOnReconnect: true, // Refetch when internet reconnects
-      networkMode: 'online', // Only run queries when online (use 'offlineFirst' for offline support)
+      staleTime: 5 * 60 * 1000,
+      gcTime: 24 * 60 * 60 * 1000, // 24h so persisted cache survives a day.
+      retry: 2,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30_000),
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: true,
+      // offlineFirst: serve cached data immediately, queue the network fetch,
+      // and resume when connectivity returns. The right default for mobile
+      // on flaky networks — especially low-end Android.
+      networkMode: 'offlineFirst',
     },
     mutations: {
-      // Global defaults for all mutations
       retry: 1,
-      networkMode: 'online',
+      networkMode: 'offlineFirst',
     },
   },
-  queryCache: new QueryCache({
-    onError: handleError,
-  }),
-  mutationCache: new MutationCache({
-    onError: handleError,
-  }),
+  queryCache: new QueryCache({ onError: handleError }),
+  mutationCache: new MutationCache({ onError: handleError }),
 });

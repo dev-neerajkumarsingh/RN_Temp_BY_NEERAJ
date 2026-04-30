@@ -12,7 +12,7 @@ type Props = {
  * Shimmer - Standalone loader component
  * Uses secondary variant by default, controlled via props
  */
-export const Shimmer: React.FC<Props> = ({
+const ShimmerComponent: React.FC<Props> = ({
   loaderStatus,
   color,
   size = 'large',
@@ -26,3 +26,5 @@ export const Shimmer: React.FC<Props> = ({
     />
   );
 };
+
+export const Shimmer = React.memo(ShimmerComponent);

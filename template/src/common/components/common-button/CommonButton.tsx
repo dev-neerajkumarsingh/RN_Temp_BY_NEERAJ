@@ -1,9 +1,11 @@
 import * as React from 'react';
 import {
+  DimensionValue,
   Pressable,
   StyleProp,
   ViewStyle,
   ActivityIndicator,
+  TextStyle,
 } from 'react-native';
 import { CommonText, CommonImage } from '@components';
 import { GlobalStyles } from '@themes';
@@ -11,19 +13,20 @@ import type { FontTypes } from '@fonts';
 import type { IconTypes } from '@icons';
 import { responsiveHeight } from '@utils';
 import { useTheme } from '@themes';
+import type { ColorKey } from '@themes';
 
 type ButtonStyles = {
   container: (
-    width: any,
-    height: any,
+    width: DimensionValue,
+    height: DimensionValue,
     backgroundColor: string,
   ) => StyleProp<ViewStyle>;
 };
 
 // Create a function to generate the styles
 const createButtonStyles = (
-  width: any,
-  height: any,
+  width: DimensionValue,
+  height: DimensionValue,
   backgroundColor: string,
 ): StyleProp<ViewStyle> => ({
   width,
@@ -34,29 +37,29 @@ const createButtonStyles = (
 
 const styles: ButtonStyles = {
   container: (
-    width: any,
-    height: any,
+    width: DimensionValue,
+    height: DimensionValue,
     backgroundColor: string,
   ) => createButtonStyles(width, height, backgroundColor),
 };
 
 type Props = {
-  width?: any;
-  height?: any;
+  width?: DimensionValue;
+  height?: DimensionValue;
   moreButtonStyle?: StyleProp<ViewStyle>[] | StyleProp<ViewStyle>;
   contentType?: 'text' | 'localSvg' | 'localNonSvg' | 'uri';
-  textColor?: string;
+  textColor?: ColorKey | (string & {});
   textAlign?: 'left' | 'center' | 'right' | 'justify' | 'auto';
   fontSize?: number;
   lineHeight?: number;
   fontType?: FontTypes;
   label?: string;
-  moreTextStyle?: {};
-  imgWidth?: string | number;
-  imgHeight?: string | number;
+  moreTextStyle?: StyleProp<TextStyle>[] | StyleProp<TextStyle>;
+  imgWidth?: DimensionValue;
+  imgHeight?: DimensionValue;
   imgSource?: string;
   svgType?: IconTypes;
-  svgColor?: string;
+  svgColor?: ColorKey | (string & {});
   disabled?: boolean;
   onPress?: () => void;
   onLongPress?: () => void;
@@ -111,7 +114,11 @@ const CommonButtonComponent: React.FC<Props> = ({
         return (
           <CommonText
             content={label || ''}
-            color={textColor || Colors.primary}
+            color={
+              textColor && textColor in Colors
+                ? Colors[textColor as keyof typeof Colors]
+                : textColor || Colors.primary
+            }
             fontSize={fontSize}
             textAlign={textAlign}
             fontType={fontType as FontTypes | undefined}

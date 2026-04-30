@@ -47,7 +47,7 @@ export const CommonImageEx = () => {
       <CommonText
         content={title}
         fontSize={12}
-        color={activeExample === example ? Colors.white : Colors.grey}
+        color={activeExample === example ? 'white' : 'grey'}
       />
     </TouchableOpacity>
   );
@@ -60,6 +60,7 @@ export const CommonImageEx = () => {
           <CommonButton
             contentType={'localSvg'}
             svgType={'arrowleft'}
+            svgColor={'secondary'}
             imgWidth={16}
             imgHeight={14}
             moreButtonStyle={styles.backBtn}
@@ -151,10 +152,10 @@ const IconItem = ({
         svgSource={icon}
         width={24}
         height={24}
-        color={colors.secondary}
+        color={'secondary'}
       />
     </View>
-    <CommonText content={label} fontSize={10} color={colors.text1} />
+    <CommonText content={label} fontSize={10} color={'secondary'} />
   </View>
 );
 

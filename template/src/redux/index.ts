@@ -5,10 +5,6 @@ import {
   logoutReducer,
   refreshTokenReducer,
 } from './reducers/authReducer';
-import { showToast, hideToast } from './reducers/toastReducer';
-import { showLoader, hideLoader } from './reducers/loaderReducer';
-import { showErrorScreen, hideErrorScreen } from './reducers/errorReducer';
-import { showPopup, hidePopup } from './reducers/popupReducer';
 import { selectLang, defaultLang } from './reducers/langReducer';
 import { useAppDispatch, useAppSelector } from './reduxHooks/reduxHooks';
 
@@ -21,14 +17,6 @@ export {
   loginReducer,
   logoutReducer,
   refreshTokenReducer,
-  showToast,
-  hideToast,
-  showLoader,
-  hideLoader,
-  showErrorScreen,
-  hideErrorScreen,
-  showPopup,
-  hidePopup,
   selectLang,
   defaultLang,
 };

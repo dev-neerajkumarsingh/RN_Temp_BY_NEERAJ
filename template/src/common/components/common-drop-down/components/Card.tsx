@@ -2,7 +2,6 @@ import React, { useMemo, useCallback } from 'react';
 import { Pressable, StyleProp, ViewStyle, TextStyle } from 'react-native';
 import { CommonText } from '@components';
 import { Pixelate } from '@utils';
-import { useTheme } from '@themes';
 import { useDropDownStyles } from '../Styles';
 
 type Props = {
@@ -26,7 +25,6 @@ const CardComponent: React.FC<Props> = ({
   moreLabelContainerStyle,
   moreLabelStyle,
 }) => {
-  const { theme } = useTheme();
   const styles = useDropDownStyles();
 
   const isSelected = highLightSelectedValue && item === selectedValue;
@@ -59,7 +57,7 @@ const CardComponent: React.FC<Props> = ({
     <Pressable style={containerStyle} onPress={handlePress}>
       <CommonText
         content={item}
-        color={isSelected ? theme.colors.secondary : theme.colors.denary}
+        color={isSelected ? 'secondary' : 'denary'}
         fontSize={isSelected ? 16 : 15}
         fontType={isSelected ? 'InterExtraBold' : 'InterMedium'}
         moreStyle={textStyle}

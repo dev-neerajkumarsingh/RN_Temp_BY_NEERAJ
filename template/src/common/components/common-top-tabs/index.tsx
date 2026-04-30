@@ -10,7 +10,7 @@ type Props = {
   onChangeTab: (val: string) => void;
 };
 
-export const CommonTopTabs: React.FC<Props> = ({
+const CommonTopTabsComponent: React.FC<Props> = ({
   tabs,
   activeTab = '',
   tabType = 1,
@@ -35,3 +35,5 @@ export const CommonTopTabs: React.FC<Props> = ({
     </View>
   );
 };
+
+export const CommonTopTabs = React.memo(CommonTopTabsComponent);

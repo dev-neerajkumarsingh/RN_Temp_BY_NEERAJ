@@ -1,22 +1,16 @@
 import React from 'react';
-import {View} from 'react-native';
-import {useSelector, useDispatch} from 'react-redux';
-import {CommonBox, CommonText, CommonButton, CommonImage} from '@components';
-import {RootState, hideErrorScreen} from '@redux';
-import {useErrorScreenStyles} from './Styles';
-import {onlineManager} from '@tanstack/react-query';
+import { View } from 'react-native';
+import { CommonBox, CommonText, CommonButton, CommonImage } from '@components';
+import { useUIStore, hideErrorScreen } from '@stores';
+import { useErrorScreenStyles } from './Styles';
+import { onlineManager } from '@tanstack/react-query';
 
-//import {} from '@network';
-import {useTheme} from '@themes';
-
-export const CommonErrorScreen = () => {
-  const [states, setStates] = React.useState({status: false});
-  const {status, buttonLabel, title, message, networkConfig} = useSelector(
-    (store: RootState) => store.errorScreen,
+const CommonErrorScreenComponent = () => {
+  const [states, setStates] = React.useState({ status: false });
+  const { status, buttonLabel, title, message, networkConfig } = useUIStore(
+    state => state.errorScreen,
   );
-  const dispatch = useDispatch();
   const styles = useErrorScreenStyles();
-  const {theme} = useTheme();
 
   const onPressTryAgain = async () => {
     //console.log('#>>>> networkConfig :: ', networkConfig)
@@ -28,11 +22,11 @@ export const CommonErrorScreen = () => {
   };
 
   const onPressClose = () => {
-    dispatch(hideErrorScreen());
+    hideErrorScreen();
   };
 
   React.useEffect(() => {
-    setStates(prev => ({...prev, status: status}));
+    setStates(prev => ({ ...prev, status: status }));
   }, [status]);
 
   if (!states.status) {
@@ -43,8 +37,8 @@ export const CommonErrorScreen = () => {
         <CommonButton
           width={20}
           height={20}
-          contentType={'svg'}
-          svgColor={theme.colors.black}
+          contentType={'localSvg'}
+          svgColor={'black'}
           moreButtonStyle={styles.backButtonContainer}
           onPress={onPressClose}
         />
@@ -55,18 +49,18 @@ export const CommonErrorScreen = () => {
               svgSource="error_network"
               width={40}
               height={55}
-              color={theme.colors.error}
+              color={'error'}
             />
           </View>
           <CommonText
-            color={theme.colors.black}
-            size={20}
+            color={'black'}
+            fontSize={20}
             content={title}
             moreStyle={styles.title}
           />
           <CommonText
-            color={theme.colors.grey1}
-            size={16}
+            color={'grey'}
+            fontSize={16}
             content={message}
             moreStyle={styles.msg}
           />
@@ -76,8 +70,8 @@ export const CommonErrorScreen = () => {
           height={45}
           contentType={'text'}
           label={buttonLabel}
-          textColor={theme.colors.primary}
-          textSize={14}
+          textColor={'primary'}
+          fontSize={14}
           moreButtonStyle={styles.buttonContainer}
           onPress={onPressTryAgain}
         />
@@ -85,3 +79,5 @@ export const CommonErrorScreen = () => {
     );
   }
 };
+
+export const CommonErrorScreen = React.memo(CommonErrorScreenComponent);

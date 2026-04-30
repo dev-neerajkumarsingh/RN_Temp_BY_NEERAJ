@@ -346,17 +346,15 @@ import { CommonTopTabs } from '@components';
 ### Toast Notifications
 
 ```tsx
-import { useAppDispatch, showToast } from '@redux';
-
-const dispatch = useAppDispatch();
+import { showToast } from '@stores';
 
 // Show success toast
-dispatch(showToast({
+showToast({
   type: 'success',
   title: 'Success!',
   message: 'Operation completed',
   duration: 3000,
-}));
+});
 
 // Toast types: 'success' | 'error' | 'info' | 'warn'
 ```
@@ -713,25 +711,23 @@ Redux-connected toast notification system with type-based styling.
 
 ```tsx
 import { useDispatch } from 'react-redux';
-import { showToast } from '@redux';
-
-const dispatch = useDispatch();
+import { showToast } from '@stores';
 
 // Show success toast
-dispatch(showToast({
+showToast({
   type: 'success',
   title: 'Success!',
   message: 'Operation completed successfully',
   duration: 3000,
-}));
+});
 
 // Show error toast
-dispatch(showToast({
+showToast({
   type: 'error',
   title: 'Error',
   message: 'Something went wrong',
   duration: 5000,
-}));
+});
 
 // Toast types: 'success' | 'error' | 'info' | 'warn'
 ```

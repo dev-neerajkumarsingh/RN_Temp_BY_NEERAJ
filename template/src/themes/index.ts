@@ -1,15 +1,18 @@
 import { lightTheme } from './list/lightTheme';
 import { darkTheme } from './list/darkTheme';
-import { ThemeContext, ThemeProvider, useTheme } from './themeContext';
+import { ThemeMode, ThemeProvider, useTheme } from './themeContext';
 import { GlobalStyles } from './globalStyles';
-import type { AppTheme } from './list/theme';
+import type { AppTheme, AppColors, ColorKey } from './list/theme';
+
+export type { ThemeMode };
 
 export {
   lightTheme,
   darkTheme,
-  ThemeContext,
   ThemeProvider,
   useTheme,
   GlobalStyles,
   AppTheme,
+  AppColors,
+  ColorKey,
 };

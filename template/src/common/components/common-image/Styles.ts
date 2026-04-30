@@ -8,16 +8,17 @@ type Style = {
 
 export const useImageStyles = () => {
   const { theme } = useTheme();
+  const Colors = theme.colors;
 
   return StyleSheet.create<Style>({
     container: {
-      backgroundColor: theme.colors.grey2,
+      backgroundColor: Colors.grey,
       overflow: 'hidden',
       alignItems: 'center',
       justifyContent: 'center',
     },
     image: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
       width: '100%',
       height: '100%',
     },

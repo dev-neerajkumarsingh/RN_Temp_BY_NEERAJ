@@ -1,40 +1,24 @@
-/* eslint-disable dot-notation */
 /**
- * Network Manager - Enhanced with isOnline and TanStack Query Support
+ * Network Manager — thin wrapper around the shared `apiClient`.
  *
- * Higher Order Middleware to make all network calls with:
- * - isOnline integration for connection detection
- * - Automatic token handling
- * - Error handling with Redux integration
- * - Support for React Query (skipToast, skipErrorScreen options)
- * - Multi-language support
- * - File upload support
+ * Responsibilities:
+ *   - Execute the HTTP request using the endpoint descriptor.
+ *   - Normalize the response into the shared `NetworkResponse<T>` shape.
+ *
+ * What it does NOT do (and must not start doing):
+ *   - Touch the Redux store or the Zustand UI store.
+ *   - Dispatch toasts, error screens, or logout actions — those belong to
+ *     the axios interceptors (cross-cutting) and to TanStack Query's
+ *     `onError` handler (query-specific).
+ *   - Branch on endpoint strings — multipart/form-data is built at the
+ *     service call site using FormData, which flows through untouched.
  */
 
-import { onlineManager } from '@tanstack/react-query';
-import { HTTP_METHODS } from '../middleware/HTTP_Methods';
-import {
-  store as Stores,
-  showToast,
-  logoutReducer,
-  showErrorScreen,
-  hideErrorScreen,
-} from '@redux';
-import { Constant } from '@constants';
-import axios, { AxiosError, AxiosRequestConfig } from 'axios';
-import { useTryCatch } from '@hooks';
-import { UtilsFunc } from '@utils';
+import type { AxiosRequestConfig, AxiosError } from 'axios';
+import { HTTP_METHODS } from './HTTP_Methods';
+import { apiClient } from '../client';
 
-type Props = {
-  api?: any;
-  apiParams?: any;
-  apiBody?: any;
-  apiFormData?: any;
-  skipToast?: boolean;
-  skipErrorScreen?: boolean;
-};
-
-export interface NetworkResponse<T = any> {
+export interface NetworkResponse<T = unknown> {
   success: boolean;
   data: T | null;
   error: string;
@@ -42,299 +26,72 @@ export interface NetworkResponse<T = any> {
   message: string;
 }
 
-/**
- * Enhanced NetworkManager with isOnline and React Query support
- *
- * @param api - API endpoint configuration from Endpoints.ts
- * @param apiParams - URL parameters (object or array)
- * @param apiBody - Request body for POST/PUT requests
- * @param skipToast - Skip showing toast (useful when React Query handles errors)
- * @param skipErrorScreen - Skip showing error screen (useful for background refetch)
- * @returns Promise<NetworkResponse<T>>
- *
- * @example
- * // Basic usage
- * const response = await NetworkManager({
- *   api: API.AUTH.LOGIN,
- *   apiParams: {},
- *   apiBody: { email, password }
- * });
- *
- * @example
- * // With React Query (skip toast/error screen)
- * const response = await NetworkManager({
- *   api: API.USER.FETCH_LIST,
- *   apiParams: { page: 1, limit: 20 },
- *   apiBody: {},
- *   skipToast: true,
- *   skipErrorScreen: true
- * });
- */
-export const NetworkManager = async <T = any>({
+interface Endpoint {
+  endpoint: string;
+  method: string;
+}
+
+interface Props {
+  api: Endpoint;
+  apiParams?: Record<string, unknown>;
+  apiBody?: Record<string, unknown>;
+  apiFormData?: FormData;
+  config?: AxiosRequestConfig;
+}
+
+export const NetworkManager = async <T = unknown>({
   api,
   apiParams = {},
   apiBody = {},
   apiFormData,
-  skipToast = false,
-  skipErrorScreen = false,
+  config = {},
 }: Props): Promise<NetworkResponse<T>> => {
-  const { isAuthenticated, accessToken } = Stores.getState()?.auth;
-  const { networkConfig } = Stores.getState()?.errorScreen;
-  const dispatch = Stores.dispatch;
+  try {
+    const isGet = api.method === HTTP_METHODS.GET;
+    const hasParams = Object.keys(apiParams).length > 0;
+    const body = apiFormData ?? (Object.keys(apiBody).length > 0 ? apiBody : undefined);
 
-  let error = '';
-  let message = '';
-  let data: any = null;
-  let response: any = null;
-  let success = false;
-  let code = 500;
-  let tempRecentConfig: AxiosRequestConfig | null = null;
+    const response = await apiClient.request({
+      ...config,
+      url: api.endpoint,
+      method: api.method,
+      params: isGet && hasParams ? apiParams : undefined,
+      data: !isGet ? body : undefined,
+    });
 
-  // Check internet connection using isOnline
-  const isOnline = onlineManager.isOnline();
-
-  // Use existing network config from error screen retry, or build new config
-  if (networkConfig) {
-    tempRecentConfig = networkConfig;
-  }
-
-  if (!networkConfig) {
-    const baseUrl = Constant.BASE_URL;
-    const endpoint = api.endpoint;
-    const method = api.method;
-    let params = apiParams;
-    let body = apiBody;
-    let headers: Record<string, string> = {
-      'Content-Type': apiFormData ? 'multipart/form-data' : 'application/json',
-    };
-
-    /**
-     * Build URL parameters from params object or array
-     * Supports:
-     * - Array: [id1, id2] -> /id1/id2
-     * - Object: {page: 1, limit: 10} -> ?page=1&limit=10
-     */
-    let requestedParams =
-    Object.keys(params).length > 0
-      ? `?reqData=${UtilsFunc.encryptData(JSON.stringify(params))}`
-      : '';
-
-    const url = `${baseUrl}${endpoint}${requestedParams}`;
-
-    // Add Authorization header if user is authenticated
-    if (isAuthenticated) {
-      headers['Authorization'] = `${accessToken}`;
-    }
-
-    // Build config WITHOUT data property initially
-    let config: AxiosRequestConfig = {
-      method,
-      url,
-      headers,
-      timeout: 10000,
-    };
-
-    if (isAuthenticated) {
-      body['token'] = accessToken;
-    }
-
-    // ==================== HANDLE NON-GET REQUESTS ====================
-    if (method !== HTTP_METHODS.GET) {
-      // Add token to body if authenticated
-
-      // Encrypting payload
-      const encryptedBody = UtilsFunc.encryptData(JSON.stringify(body));
-
-      // Handle multipart/form-data for file uploads
-      if (endpoint.includes('api/user/v1/auth/register')) {
-        // Multiple file attachments
-        const formData1 = new FormData();
-        if (apiFormData && Object.keys(apiFormData).length > 0) {
-          apiFormData.profileImages.map((item: any) => {
-            formData1.append('profileImages', item);
-          });
-          formData1.append('profilePic', apiFormData.profile);
-          formData1.append('securityFiles', apiFormData.securityFiles);
-        }
-        formData1.append('reqData', encryptedBody);
-        config.data = formData1;
-      } else if (endpoint.includes('api/user/v1/account/update-profile')) {
-        // Single file attachment
-        const formData1 = new FormData();
-        if (apiFormData && Object.keys(apiFormData).length > 0) {
-          formData1.append('profilePic', apiFormData);
-          formData1.append('reqData', encryptedBody);
-          config.data = formData1;
-        } else {
-          config.data = { reqData: encryptedBody };
-        }
-      } else {
-        // Standard POST/PUT/DELETE requests
-        config.data = { reqData: encryptedBody };
-      }
-    }
-    // ==================== HANDLE GET REQUESTS ====================
-    // For GET requests, don't add data property at all
-    // Query params are already in the URL via requestedParams
-
-    tempRecentConfig = config;
-  }
-
-  console.info('#>> Network_Manager :: tempRecentConfig :: ', tempRecentConfig);
-
-  // Execute the API request with error handling
-  const { data: responseData, error: responseError } = await useTryCatch(
-    axios(tempRecentConfig!),
-  );
-
-  // ==================== ERROR HANDLING ====================
-  if (responseError) {
-    console.error('#>> Network_Manager :: responseError :: ', responseError);
-    success = false;
-
-    // Handle no internet connection FIRST
-    if (!isOnline && !skipErrorScreen) {
-      dispatch(
-        showErrorScreen({
-          title: 'Oops!',
-          message:
-            'It seems your internet connection is off. Please check your connection and try again!',
-          buttonLabel: 'Try again',
-          networkConfig: tempRecentConfig,
-        }),
-      );
-      return {
-        success,
-        data,
-        error: 'No internet connection',
-        code,
-        message: 'No internet connection',
+    // The response interceptor decrypts the payload into
+    // `{ status, response: { status, message, data, error } }`.
+    const payload = response.data as {
+      status?: boolean;
+      response?: {
+        status?: number;
+        message?: string;
+        data?: T;
+        error?: string;
       };
-    }
-
-    // Try to extract response data if available
-    const axiosError = responseError as AxiosError;
-    const errorResponse = axiosError.response;
-
-    if (errorResponse?.data) {
-      try {
-        // Attempt to decrypt response if encrypted
-        const decryptResponse = JSON.parse(
-          UtilsFunc.decryptData(`${(errorResponse.data as any)?.data}`),
-        );
-
-        code = decryptResponse?.response?.status || errorResponse.status || 500;
-        message = decryptResponse?.response?.message || 'Network Error';
-        response = decryptResponse;
-      } catch (decryptError) {
-        // If decryption fails, use raw response
-        code = errorResponse.status || 500;
-        message = (errorResponse.data as any)?.message || errorResponse.statusText || 'Network Error';
-        response = errorResponse.data;
-      }
-    } else {
-      // No response from server (network error, timeout, etc.)
-      code = 500;
-      message = axiosError.message || 'Network Error';
-      response = null;
-    }
-
-    // Handle 401 Unauthorized (token expired)
-    if (code === 401 && isAuthenticated) {
-      dispatch(logoutReducer());
-      if (!skipToast) {
-        dispatch(
-          showToast({
-            type: 'error',
-            title: 'Session Expired',
-            message: "You've been logged out. Please login again.",
-            duration: 3000,
-          }),
-        );
-      }
-    }
-
-    // Handle other errors (4xx, 5xx) - skip 401 since already handled
-    if (code !== 401 && !skipToast) {
-      dispatch(
-        showToast({
-          type: 'error',
-          title: 'Error',
-          message: response?.msg || message || 'Something went wrong',
-          duration: 3000,
-        }),
-      );
-    }
+      data?: T;
+    };
 
     return {
-      success,
-      data: response,
-      error: `${responseError}`,
-      code,
-      message,
+      success: payload?.status ?? true,
+      data: (payload?.response?.data ?? payload?.data ?? null) as T | null,
+      error: payload?.response?.error ?? '',
+      code: payload?.response?.status ?? response.status,
+      message: payload?.response?.message ?? '',
+    };
+  } catch (err) {
+    const axiosErr = err as AxiosError;
+    const errBody = axiosErr.response?.data as
+      | { response?: { status?: number; message?: string }; message?: string }
+      | undefined;
+
+    return {
+      success: false,
+      data: null,
+      error: axiosErr.message ?? String(err),
+      code: errBody?.response?.status ?? axiosErr.response?.status ?? 500,
+      message:
+        errBody?.response?.message ?? errBody?.message ?? axiosErr.message ?? 'Network Error',
     };
   }
-
-  // ==================== SUCCESS HANDLING ====================
-  if (responseData) {
-    console.log('#>> Network_Manager :: responseData :: ', responseData);
-
-    try {
-      const decryptResponse = JSON.parse(
-        UtilsFunc.decryptData(`${responseData?.data?.data}`),
-      );
-
-      console.log('#>>> decryptResponse :: ', decryptResponse);
-      code = decryptResponse?.response?.status || responseData.status;
-      message = decryptResponse?.response?.message || '';
-      response = decryptResponse?.response?.data;
-      error = decryptResponse?.response?.error || '';
-
-      // Handle successful responses (200, 201)
-      if (responseData?.status === 200 || responseData?.status === 201) {
-        data = response;
-        success = decryptResponse?.status ?? true;
-        message = message;
-
-        // Hide error screen on successful response
-        dispatch(hideErrorScreen());
-      }
-
-      // Double-check for 401 in success response (edge case)
-      if (code === 401 && isAuthenticated) {
-        dispatch(logoutReducer());
-        if (!skipToast) {
-          dispatch(
-            showToast({
-              type: 'error',
-              title: 'Session Expired',
-              message: "You've been logged out. Please login again.",
-              duration: 3000,
-            }),
-          );
-        }
-      }
-
-      return { success, data, error, code, message };
-    } catch (decryptError) {
-      // Handle decryption failure
-      console.error('#>> Decryption Error :: ', decryptError);
-      return {
-        success: false,
-        data: null,
-        error: 'Failed to decrypt response',
-        code: 500,
-        message: 'Response decryption failed',
-      };
-    }
-  }
-
-  // Fallback return (should never reach here)
-  return {
-    success: false,
-    data: null,
-    error: 'Unknown error occurred',
-    code: 500,
-    message: 'Unknown error',
-  };
 };

@@ -2,11 +2,12 @@
 # macOS
 # ========================================
 .DS_Store
-
+.claude/
 # ========================================
 # Xcode / iOS
 # ========================================
-build/
+ios/build/
+ios/Pods/
 *.pbxuser
 !default.pbxuser
 *.mode1v3
@@ -23,9 +24,7 @@ DerivedData
 *.ipa
 *.xcuserstate
 **/.xcode.env.local
-
-# Keep Podfile.lock tracked for consistent iOS builds
-# ios/Podfile.lock
+ios/Podfile.lock
 
 # CocoaPods / Ruby
 **/Pods/
@@ -60,8 +59,9 @@ npm-debug.log
 yarn-error.log
 
 # Lock files (keep them for deterministic installs)
-# package-lock.json
-# yarn.lock
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
 # Metro / Watchman temporary files
 .metro-health-check*

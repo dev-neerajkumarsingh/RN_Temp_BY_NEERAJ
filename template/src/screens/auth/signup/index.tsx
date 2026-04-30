@@ -15,7 +15,7 @@ export const Signup = () => {
     inputVal8: '',
   });
   const styles = useSignupStyles();
-  const { theme, currentThemeName, setTheme } = useTheme();
+  const { theme, themeMode, toggleTheme } = useTheme();
 
   return (
     <CommonBox useKeyboardAvoidingView>
@@ -97,7 +97,7 @@ export const Signup = () => {
         label="Change Theme"
         textColor={theme.colors.primary}
         fontSize={20}
-        onPress={() => setTheme(currentThemeName === 'dark' ? 'light' : 'dark')}
+        onPress={() => toggleTheme()}
         moreButtonStyle={styles.btnStyle}
       />
     </CommonBox>

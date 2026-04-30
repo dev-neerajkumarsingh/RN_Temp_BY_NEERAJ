@@ -23,6 +23,7 @@ module.exports = {
           '@screens': './src/screens/index.ts',
           '@network': './src/network/index.ts',
           '@redux': './src/redux/index.ts',
+          '@stores': './src/stores/index.ts',
           '@themes': './src/themes/index.ts',
           '@utils': './src/utils/index.ts',
         },

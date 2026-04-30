@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
+  DimensionValue,
+  ViewStyle,
   Pressable,
   Animated,
   Easing,
@@ -8,6 +10,8 @@ import {
   UIManager,
   View,
   Keyboard,
+  StyleProp,
+  ImageStyle,
 } from 'react-native';
 import { CommonImage, CommonText } from '@components';
 import { useTheme } from '@themes';
@@ -26,15 +30,15 @@ type Props = {
   selectedValue: string;
   onPressSelected: (val: string) => void;
   highLightSelectedValue?: true;
-  moreContainerStyles?: {};
-  moreLabelContainerStyle?: {};
-  moreIconStyle?: {};
-  moreLabelStyle?: {};
+  moreContainerStyles?: StyleProp<ViewStyle>[] | StyleProp<ViewStyle>;
+  moreLabelContainerStyle?: StyleProp<ViewStyle>;
+  moreIconStyle?: StyleProp<ViewStyle>;
+  moreLabelStyle?: StyleProp<ViewStyle>;
   labelIconPath?: IconTypes;
   iconType?: IconTypes;
-  width?: number;
-  height?: number;
-  iconStyle?: {};
+  width?: DimensionValue;
+  height?: DimensionValue;
+  iconStyle?: StyleProp<ImageStyle>;
   down?: false;
   initialRotationOutput1?: '-90deg';
   isLead?: false;
@@ -45,15 +49,15 @@ export const CommonDropDown: React.FC<Props> = ({
   selectedValue = '',
   onPressSelected,
   highLightSelectedValue = true,
-  moreContainerStyles = {},
-  moreLabelContainerStyle = {},
-  moreIconStyle = {},
-  moreLabelStyle = {},
+  moreContainerStyles,
+  moreLabelContainerStyle,
+  moreIconStyle,
+  moreLabelStyle,
   labelIconPath = 'gender',
   iconType = 'arrowUp',
   width = 14,
   height = 14,
-  iconStyle = {},
+  iconStyle,
   initialRotationOutput1 = '-180deg',
   isLead = false,
 }) => {
@@ -125,7 +129,7 @@ export const CommonDropDown: React.FC<Props> = ({
               svgSource={labelIconPath as IconTypes} // labelIconPath prop here...
               width={width}
               height={height}
-              color={theme.colors.secondary}
+              color={'secondary'}
               resizeMode="contain"
               moreStyles={iconStyle}
             />
@@ -134,10 +138,10 @@ export const CommonDropDown: React.FC<Props> = ({
             content={selectedValue}
             color={
               initialData.find(item => item === selectedValue)
-                ? theme.colors.secondary
-                : theme.colors.text1
+                ? 'secondary'
+                : 'text'
             }
-            size={15}
+            fontSize={15}
             fontType="InterMedium"
             moreStyle={[{ marginLeft: 10 }, moreLabelStyle]}
           />
@@ -161,7 +165,7 @@ export const CommonDropDown: React.FC<Props> = ({
                 svgSource={iconType as IconTypes} // iconType prop here...
                 width={width}
                 height={height}
-                color={theme.colors.secondary}
+                color={'secondary'}
                 resizeMode="contain"
                 moreStyles={iconStyle}
               />
@@ -185,7 +189,7 @@ export const CommonDropDown: React.FC<Props> = ({
               svgSource="arrowleft" // By default pass Arrow icon from assets here...
               width={width}
               height={height}
-              color={theme.colors.secondary}
+              color={'secondary'}
               resizeMode="contain"
               moreStyles={iconStyle}
             />

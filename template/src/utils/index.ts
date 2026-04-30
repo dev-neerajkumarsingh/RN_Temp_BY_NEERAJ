@@ -10,6 +10,11 @@ import {
   SCREEN_WIDTH,
 } from './responsiveUtils/ResponsiveUtils';
 import { Pixelate } from './pixelate/Pixelate';
+import {
+  initSecureStorage,
+  getSecureStorage,
+  MMKVStorageAdapter,
+} from './storage';
 
 export {
   UtilsFunc,
@@ -22,4 +27,7 @@ export {
   Pixelate,
   SCREEN_HEIGHT,
   SCREEN_WIDTH,
+  initSecureStorage,
+  getSecureStorage,
+  MMKVStorageAdapter,
 };

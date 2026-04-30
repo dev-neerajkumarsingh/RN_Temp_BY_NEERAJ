@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { View, Pressable, Keyboard } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
 import { useTheme, GlobalStyles } from '@themes';
-import { RootState, hideToast } from '@redux';
+import { useUIStore, hideToast } from '@stores';
 import { CommonText, CommonImage } from '@components';
 import { useToasterStyles } from './Styles';
 import type { IconTypes } from '@icons';
@@ -17,13 +16,12 @@ const TOAST_CONFIG: Record<ToastType, { icon: IconTypes; colorKey: 'error' | 'su
   warn: { icon: 'warning', colorKey: 'warning', bgKey: 'lightWarning' },
 };
 
-export const CommonToaster = () => {
+const CommonToasterComponent = () => {
   const [showToaster, setShowToaster] = useState(false);
-  const { status, type, title, message, duration } = useSelector(
-    (store: RootState) => store.toast,
+  const { status, type, title, message, duration } = useUIStore(
+    (state) => state.toast,
   );
   const { theme } = useTheme();
-  const dispatch = useDispatch();
   const toasterStyles = useToasterStyles();
   const globalStyles = GlobalStyles(theme);
 
@@ -73,8 +71,8 @@ export const CommonToaster = () => {
 
   // Memoize close handler
   const handleClose = useCallback(() => {
-    dispatch(hideToast());
-  }, [dispatch]);
+    hideToast();
+  }, []);
 
   useEffect(() => {
     setShowToaster(Boolean(status));
@@ -82,12 +80,12 @@ export const CommonToaster = () => {
     if (status) {
       Keyboard.dismiss();
       const timer = setTimeout(() => {
-        dispatch(hideToast());
+        hideToast();
       }, duration);
 
       return () => clearTimeout(timer);
     }
-  }, [status, dispatch, duration]);
+  }, [status, duration]);
 
   if (!showToaster) {
     return null;
@@ -119,7 +117,7 @@ export const CommonToaster = () => {
             {message && (
               <CommonText
                 content={message}
-                color={title ? theme.colors.black : toastColors.textColor}
+                color={title ? 'black' : toastColors.textColor}
                 fontSize={13}
                 fontType={'InterLight'}
                 moreStyle={messageStyle}
@@ -135,10 +133,12 @@ export const CommonToaster = () => {
             svgSource="close"
             width={16}
             height={16}
-            color={theme.colors.black}
+            color={'black'}
           />
         </Pressable>
       </View>
     </View>
   );
 };
+
+export const CommonToaster = React.memo(CommonToasterComponent);

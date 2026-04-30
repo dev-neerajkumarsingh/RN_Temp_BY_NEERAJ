@@ -1,18 +1,16 @@
 import * as React from 'react';
 import { View } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState, hidePopup } from '@redux';
+import { useUIStore, hidePopup } from '@stores';
 import { CommonText, CommonButton } from '@components';
 import { useNavigation, StackActions } from '@react-navigation/native';
 import { useTheme } from '@themes';
 import { useStyles } from './Styles';
 
-export const CommonPopup = () => {
+const CommonPopupComponent = () => {
   const [states, setStates] = React.useState({ modalStatus: false });
-  const { status, title, buttonLabel, onPressType } = useSelector(
-    (store: RootState) => store.popup,
+  const { status, title, buttonLabel, onPressType } = useUIStore(
+    (state) => state.popup,
   );
-  const dispatch = useDispatch();
   const navigation = useNavigation();
   const styles = useStyles();
   const { theme } = useTheme();
@@ -23,7 +21,7 @@ export const CommonPopup = () => {
 
   const onPressClose = () => {
     setStates(prev => ({ ...prev, modalStatus: false }));
-    dispatch(hidePopup());
+    hidePopup();
     if (onPressType === 'goback') {
       navigation.goBack();
     }
@@ -39,8 +37,8 @@ export const CommonPopup = () => {
       <View style={styles.container}>
         <View style={styles.popupContainer}>
           <CommonText
-            color={theme.colors.primary}
-            size={16}
+            color={'primary'}
+            fontSize={16}
             content={title}
             moreStyle={styles.title}
           />
@@ -49,8 +47,8 @@ export const CommonPopup = () => {
               width={'100%'}
               height={35}
               contentType={'text'}
-              textColor={theme.colors.primary}
-              textSize={14}
+              textColor={'primary'}
+              fontSize={14}
               label={buttonLabel}
               onPress={onPressClose}
               moreButtonStyle={styles.buttonStyle}
@@ -61,3 +59,5 @@ export const CommonPopup = () => {
     );
   }
 };
+
+export const CommonPopup = React.memo(CommonPopupComponent);
