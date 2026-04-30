@@ -13,6 +13,6 @@ export const MMKVStorageAdapter: Storage = {
   },
   removeItem: async (key) => {
     const storage = await initSecureStorage();
-    storage.delete(key);
+    storage.remove(key);
   },
 };

@@ -1,4 +1,4 @@
-import { MMKV } from 'react-native-mmkv';
+import { createMMKV, type MMKV } from 'react-native-mmkv';
 import {
   setGenericPassword,
   getGenericPassword,
@@ -37,7 +37,9 @@ export const initSecureStorage = (): Promise<MMKV> => {
 
   initPromise = (async () => {
     const encryptionKey = await getOrCreateMasterKey();
-    storageInstance = new MMKV({ id: MMKV_ID, encryptionKey });
+    // react-native-mmkv v4 replaced `new MMKV(...)` with `createMMKV(...)`.
+    // `MMKV` is now a TYPE-only export and is undefined at runtime.
+    storageInstance = createMMKV({ id: MMKV_ID, encryptionKey });
     return storageInstance;
   })();
 
